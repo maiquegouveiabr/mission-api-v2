@@ -175,7 +175,6 @@ export default function Unassigned({
 }
 
 export async function getServerSideProps() {
-  const test = "";
   const isDev = process.env.NODE_ENV === "development";
   const url = isDev
     ? "http://localhost:3000/api/referrals/unassigned"
