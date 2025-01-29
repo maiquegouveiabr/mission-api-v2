@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/no-anonymous-default-export
 export default (timestamp: number, timeIncluded: boolean) => {
-  const offset = -3 * 60 * 60 * 1000; //(GMT-3)
-  const date = new Date(timestamp + offset);
+  const date = new Date(timestamp);
   const day = `${date.getDate()}`.padStart(2, "0");
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const year = date.getFullYear();
