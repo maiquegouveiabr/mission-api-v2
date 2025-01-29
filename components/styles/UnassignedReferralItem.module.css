@@ -1,0 +1,25 @@
+.listItem {
+  list-style-type: none;
+}
+
+.spanItem {
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  font-family: Arial, Helvetica, sans-serif;
+  text-decoration: inherit;
+}
+
+.spanContainer {
+  margin: 0;
+  padding: 0;
+}
+
+.linkItem:link {
+  font-weight: 600;
+  color: blueviolet;
+}
+
+.linkItem:visited {
+  font-weight: 600;
+  color: blueviolet;
+}
