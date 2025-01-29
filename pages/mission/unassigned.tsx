@@ -178,7 +178,7 @@ export async function getServerSideProps() {
   const isDev = process.env.NODE_ENV === "development";
   const url = isDev
     ? "http://localhost:3000/api/referrals/unassigned"
-    : "https://mission-api-gamma.vercel.app/api/referrals/unassigned";
+    : "https://mission-api-v2.vercel.app/api/referrals/unassigned";
   try {
     const response = await fetch(url);
     const unassigned = await response.json();
