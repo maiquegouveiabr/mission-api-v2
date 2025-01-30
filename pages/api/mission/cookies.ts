@@ -8,7 +8,9 @@ import puppeteer from "puppeteer";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { username } = req.body;
   const { password } = req.body;
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.connect({
+    browserWSEndpoint: `wss://chrome.browserless.io?token=RgUZmLd0KF5gxG3b93d4771a20b2783b6d4ba1ed21`,
+  });
 
   try {
     if (username && password) {
