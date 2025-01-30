@@ -1,29 +1,20 @@
-import {
-  AreaInfo,
-  ContactAttempt,
-  ReferralCompleteNoPerson,
-} from "@/interfaces";
+import { Referral } from "@/interfaces";
 import styles from "./styles/UnassignedReferralItem.module.css";
 import timestampToDate from "@/util/timestampToDate";
 
 interface UnassignedReferralItemProps {
-  areaInfo: AreaInfo;
-  contactAttempts: ContactAttempt[];
-  referral: ReferralCompleteNoPerson;
+  referral: Referral;
+  dataLoaded: boolean;
 }
 
-const UnassignedReferralItem = ({
-  referral,
-  areaInfo,
-  contactAttempts,
-}: UnassignedReferralItemProps) => {
+const UnassignedReferralItem = ({ referral }: UnassignedReferralItemProps) => {
   return (
     <div className={styles.container}>
       <li>
         <a
           className={styles.linkItem}
           target="_blank"
-          href={`https://referralmanager.churchofjesuschrist.org/person/${referral.id}`}
+          href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}
         >
           <p className={styles.spanItem}>
             {referral.firstName} {referral.lastName ? referral.lastName : ""}
@@ -34,21 +25,25 @@ const UnassignedReferralItem = ({
           {timestampToDate(new Date(referral.createDate).getTime(), true)}
         </span>
         <br />
-        <span className={styles.spanItem}>
-          {referral.contactInfo.phoneNumbers[0].number}
-        </span>
+        {referral.contactInfo && (
+          <>
+            <span className={styles.spanItem}>
+              {referral.contactInfo.phoneNumbers[0].number}
+            </span>
+            <br />
+          </>
+        )}
+        <span className={styles.spanItem}>{referral.address}</span>
         <br />
-        <span className={styles.spanItem}>
-          {referral.householdInfo.address}
-        </span>
+        {referral.contactAttempts && (
+          <span className={styles.spanItem}>
+            Tentativas: {referral.contactAttempts.length}
+          </span>
+        )}
         <br />
-        <span className={styles.spanItem}>
-          Tentativas: {contactAttempts.length}
-        </span>
-        <br />
-        {areaInfo.proselytingAreas && (
+        {referral.areaInfo && referral.areaInfo.proselytingAreas && (
           <span className={`${styles.spanItem}`} style={{ fontWeight: "bold" }}>
-            Suggested Area: {areaInfo.proselytingAreas[0].name}
+            Suggested Area: {referral.areaInfo.proselytingAreas[0].name}
           </span>
         )}
       </li>

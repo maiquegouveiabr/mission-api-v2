@@ -5,7 +5,8 @@ import fetchMissionArea from "@/util/api/fetchMissionAreas";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const missionAreas = await fetchMissionArea();
+  const { refreshToken } = req.query;
+  const missionAreas = await fetchMissionArea(String(refreshToken));
   const successFilePath = join(process.cwd(), "public/html/areas.html");
 
   try {

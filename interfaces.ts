@@ -80,6 +80,9 @@ export interface Zone {
 }
 
 export interface Referral {
+  contactInfo: ContactInfo | null;
+  areaInfo: AreaInfo | null;
+  contactAttempts: ContactAttempt[] | [];
   personGuid: string;
   householdGuid: string;
   firstName: string;
@@ -173,8 +176,8 @@ export interface DataPrivacyData {
 }
 
 export interface ReferralComplete {
-  contactAttempts: ContactAttempt[] | null;
-  areaInfo: AreaInfo | null;
+  contactAttempts: ContactAttempt[];
+  areaInfo: AreaInfo;
   person: {
     id: string;
     householdId: string;

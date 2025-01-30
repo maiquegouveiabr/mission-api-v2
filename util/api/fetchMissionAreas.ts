@@ -2,9 +2,10 @@ import fetchData from "./fetchData";
 import { District, ProsArea, Zone } from "@/interfaces";
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async (): Promise<ProsArea[]> => {
+export default async (refreshToken: string): Promise<ProsArea[]> => {
   const data = await fetchData(
-    "https://referralmanager.churchofjesuschrist.org/services/mission/14319"
+    "https://referralmanager.churchofjesuschrist.org/services/mission/14319",
+    refreshToken
   );
   if (!data) return [];
 

@@ -1,8 +1,4 @@
-import {
-  AreaInfo,
-  ContactAttempt,
-  ReferralCompleteNoPerson,
-} from "@/interfaces";
+import { Referral } from "@/interfaces";
 import UnassignedList from "@/components/UnassignedList";
 import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
@@ -14,57 +10,57 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import timestampToDate from "@/util/timestampToDate";
 
+import { GetServerSideProps } from "next";
+import sleep from "@/util/sleep";
+
 interface UnassignedProps {
-  areaInfo: AreaInfo;
-  contactAttempts: ContactAttempt[];
-  person: ReferralCompleteNoPerson;
+  referrals: Referral[];
 }
 
-export default function Unassigned({
-  unassigned,
-}: {
-  unassigned: UnassignedProps[];
-}) {
-  const [filteredUnassigned, setFiltereredUnassigned] = useState(unassigned);
+export default function Unassigned({ referrals }: UnassignedProps) {
+  const [unassigned, setUnassigned] = useState(referrals);
+  const [filteredUnassigned, setFilteredUnassigned] = useState(referrals);
   const [dateState, setDateState] = useState(true);
   const [attemptsState, setAttemptsState] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const handleSetFilterUBA = () => {
     const filtered = unassigned.filter((ref) => {
       if (
+        ref.areaInfo &&
         ref.areaInfo.organizations &&
         ref.areaInfo.organizations[0].id === 31859
       ) {
         return ref;
       }
     });
-    setFiltereredUnassigned(filtered);
+    setFilteredUnassigned(filtered);
   };
 
   const handleSetDate = () => {
     setDateState(!dateState);
     if (dateState) {
       const filtered = unassigned.sort((a, b) => {
-        if (a.person.createDate < b.person.createDate) {
+        if (a.createDate < b.createDate) {
           return -1;
         }
-        if (a.person.createDate > b.person.createDate) {
+        if (a.createDate > b.createDate) {
           return 1;
         }
         return 0;
       });
-      setFiltereredUnassigned(filtered);
+      setFilteredUnassigned(filtered);
     } else {
       const filtered = unassigned.sort((a, b) => {
-        if (b.person.createDate < a.person.createDate) {
+        if (b.createDate < a.createDate) {
           return -1;
         }
-        if (b.person.createDate > a.person.createDate) {
+        if (b.createDate > a.createDate) {
           return 1;
         }
         return 0;
       });
-      setFiltereredUnassigned(filtered);
+      setFilteredUnassigned(filtered);
     }
   };
 
@@ -80,7 +76,7 @@ export default function Unassigned({
         }
         return 0;
       });
-      setFiltereredUnassigned(filtered);
+      setFilteredUnassigned(filtered);
     } else {
       const filtered = unassigned.sort((a, b) => {
         if (b.contactAttempts.length < a.contactAttempts.length) {
@@ -91,34 +87,63 @@ export default function Unassigned({
         }
         return 0;
       });
-      setFiltereredUnassigned(filtered);
+      setFilteredUnassigned(filtered);
     }
   };
 
-  const handleClick = async (ref: UnassignedProps) => {
-    try {
-      const text = `@${
-        ref.areaInfo.proselytingAreas
-          ? `${ref.areaInfo.proselytingAreas[0].name}`
-          : "AREA_PLACEHOLDER"
-      }\n${
-        ref.areaInfo.proselytingAreas
-          ? `*${ref.areaInfo.proselytingAreas[0].name}*`
-          : "*AREA_PLACEHOLDER*"
-      }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${
-        ref.person.lastName
-          ? `*${ref.person.firstName} ${ref.person.lastName}*`
-          : `*${ref.person.firstName}*`
-      } - *OFERTA_PLACEHOLDER*\nNúmero: ${
-        ref.person.contactInfo.phoneNumbers[0].number
-      }\n*Cadastro em: ${timestampToDate(
-        new Date(ref.person.createDate).getTime(),
-        true
-      )}*\nAdicionamos uma tarefa como observação!`;
-      await navigator.clipboard.writeText(text);
-    } catch (error) {
-      console.error(error);
-      alert("There was an error copying the text!");
+  const handleClick = async (ref: Referral) => {
+    if (ref.areaInfo && ref.contactInfo) {
+      try {
+        const text = `@${
+          ref.areaInfo.proselytingAreas
+            ? `${ref.areaInfo.proselytingAreas[0].name}`
+            : "AREA_PLACEHOLDER"
+        }\n${
+          ref.areaInfo.proselytingAreas
+            ? `*${ref.areaInfo.proselytingAreas[0].name}*`
+            : "*AREA_PLACEHOLDER*"
+        }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${
+          ref.lastName
+            ? `*${ref.firstName} ${ref.lastName}*`
+            : `*${ref.firstName}*`
+        } - *OFERTA_PLACEHOLDER*\nNúmero: ${
+          ref.contactInfo.phoneNumbers[0].number
+        }\n*Cadastro em: ${timestampToDate(
+          new Date(ref.createDate).getTime(),
+          true
+        )}*\nAdicionamos uma tarefa como observação!`;
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        console.error(error);
+        alert("There was an error copying the text!");
+      }
+    }
+  };
+
+  const handleLoadData = async () => {
+    const refreshToken = localStorage.getItem("REFRESH_TOKEN");
+    const areaResponse = await fetch(
+      `https://mission-api-v2.vercel.app/api/referrals/areaInfoApi?refreshToken=${refreshToken}`,
+      {
+        method: "POST",
+        body: JSON.stringify(referrals),
+      }
+    );
+    if (!areaResponse.ok) {
+    } else {
+      const referralsCompleteWithArea = await areaResponse.json();
+      await sleep(3000);
+      const attemptsResponse = await fetch(
+        `https://mission-api-v2.vercel.app/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`,
+        {
+          method: "POST",
+          body: JSON.stringify(referralsCompleteWithArea),
+        }
+      );
+      const referralsWithAttempts = await attemptsResponse.json();
+      setDataLoaded(true);
+      setUnassigned(referralsWithAttempts);
+      setFilteredUnassigned(referralsWithAttempts);
     }
   };
 
@@ -139,11 +164,17 @@ export default function Unassigned({
           />
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group">
-          <Button onClick={handleSetFilterUBA}>Uba</Button>
-          <Button onClick={handleSetAttempts}>
-            Attempts
-            <SwapVertIcon />
-          </Button>
+          {dataLoaded ? (
+            <>
+              <Button onClick={handleSetFilterUBA}>Uba</Button>
+              <Button onClick={handleSetAttempts}>
+                Attempts
+                <SwapVertIcon />
+              </Button>
+            </>
+          ) : (
+            <Button onClick={handleLoadData}>Load</Button>
+          )}
           <Button onClick={handleSetDate}>
             Date
             <SwapVertIcon />
@@ -152,21 +183,22 @@ export default function Unassigned({
       </div>
       <UnassignedList>
         {filteredUnassigned.map((filteredUnassigned) => (
-          <div key={filteredUnassigned.person.id}>
+          <div key={filteredUnassigned.createDate}>
             <ReferralItem
-              key={filteredUnassigned.person.id}
-              areaInfo={filteredUnassigned.areaInfo}
-              contactAttempts={filteredUnassigned.contactAttempts}
-              referral={filteredUnassigned.person}
+              key={filteredUnassigned.createDate}
+              referral={filteredUnassigned}
+              dataLoaded={dataLoaded}
             />
-            <Button
-              onClick={() => handleClick(filteredUnassigned)}
-              style={{ marginTop: "10px" }}
-              variant="contained"
-              endIcon={<ContentPasteIcon />}
-            >
-              Copy
-            </Button>
+            {dataLoaded && (
+              <Button
+                onClick={() => handleClick(filteredUnassigned)}
+                style={{ marginTop: "10px" }}
+                variant="contained"
+                endIcon={<ContentPasteIcon />}
+              >
+                Copy
+              </Button>
+            )}
           </div>
         ))}
       </UnassignedList>
@@ -174,21 +206,22 @@ export default function Unassigned({
   );
 }
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { refreshToken } = context.query;
   const isDev = process.env.NODE_ENV === "development";
   const url = isDev
-    ? "http://localhost:3000/api/referrals/unassigned"
-    : "https://mission-api-v2.vercel.app/api/referrals/unassigned";
+    ? `http://localhost:3000/api/referrals/unassigned?refreshToken=${refreshToken}`
+    : `https://mission-api-v2.vercel.app/api/referrals/unassigned?refreshToken=${refreshToken}`;
   try {
     const response = await fetch(url);
-    const unassigned = await response.json();
+    const referrals = await response.json();
     return {
-      props: { unassigned },
+      props: { referrals },
     };
   } catch (error) {
     console.error(error);
     return {
-      props: { unassigned: [] },
+      props: { referrals: [] },
     };
   }
-}
+};
