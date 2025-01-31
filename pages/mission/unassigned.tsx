@@ -92,6 +92,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleClick = async (ref: Referral) => {
+    console.log(ref);
     if (ref.areaInfo && ref.contactInfo) {
       try {
         const text = `@${
@@ -147,6 +148,28 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     }
   };
 
+  const handleLoadReferralInfo = async (referral: Referral) => {
+    const refreshToken = localStorage.getItem("REFRESH_TOKEN");
+    const response = await fetch(
+      `https://mission-api-v2.vercel.app/api/referrals/referralInfoApi?refreshToken=${refreshToken}`,
+      {
+        method: "POST",
+        body: JSON.stringify(referral),
+      }
+    );
+    const data = await response.json();
+    const copyUnassigned = [...unassigned];
+    const index = copyUnassigned.findIndex(
+      (ref) => ref.personGuid === referral.personGuid
+    );
+    if (index !== -1) {
+      copyUnassigned[index] = data;
+    }
+    console.log(copyUnassigned);
+    setFilteredUnassigned(copyUnassigned);
+    setUnassigned(copyUnassigned);
+  };
+
   return (
     <div>
       <div className={styles.titleContainer}>
@@ -189,7 +212,17 @@ export default function Unassigned({ referrals }: UnassignedProps) {
               referral={filteredUnassigned}
               dataLoaded={dataLoaded}
             />
-            {dataLoaded && (
+            {!filteredUnassigned.contactInfo && dataLoaded && (
+              <Button
+                onClick={() => handleLoadReferralInfo(filteredUnassigned)}
+                style={{ marginTop: "10px" }}
+                variant="contained"
+                endIcon={<ContentPasteIcon />}
+              >
+                Contact Info
+              </Button>
+            )}
+            {dataLoaded && filteredUnassigned.contactInfo && (
               <Button
                 onClick={() => handleClick(filteredUnassigned)}
                 style={{ marginTop: "10px" }}

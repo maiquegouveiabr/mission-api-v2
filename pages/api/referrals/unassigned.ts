@@ -28,7 +28,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
     );
 
-    console.log(unassignedReferrals);
     res.status(200).send(unassignedReferrals);
   }
 };
