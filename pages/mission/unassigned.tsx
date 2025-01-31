@@ -9,7 +9,7 @@ import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import timestampToDate from "@/util/timestampToDate";
-
+import SyncIcon from "@mui/icons-material/Sync";
 import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
 
@@ -217,7 +217,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
                 onClick={() => handleLoadReferralInfo(filteredUnassigned)}
                 style={{ marginTop: "10px" }}
                 variant="contained"
-                endIcon={<ContentPasteIcon />}
+                endIcon={<SyncIcon />}
               >
                 Contact Info
               </Button>
