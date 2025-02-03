@@ -80,6 +80,8 @@ export interface Zone {
 }
 
 export interface Referral {
+  personOffer: PersonOffer | null;
+  offerItem: OfferItem | null;
   contactInfo: ContactInfo | null;
   areaInfo: AreaInfo | null;
   contactAttempts: ContactAttempt[] | [];
@@ -373,4 +375,70 @@ export interface AreaInfo {
   formattedAddress: string | null;
   areaIdRejectionReasons: any | null;
   isBestWardLanguageMatch: boolean;
+}
+
+export interface OfferItem {
+  adConcept: string;
+  adGroup: string;
+  adPlacement: string;
+  adText: string;
+  adTopic: string;
+  adType: string;
+  adVendor: string;
+  boncomCampaign: string;
+  campaignName: string;
+  cid: string;
+  destinationURL: string;
+  displayUrl: string;
+  dynamicDescriptions: string[];
+  headline: string;
+  landingPage: string;
+  landingSite: string;
+  language: string;
+  mediaType: string;
+  previewImage: string;
+  searchLine1: string;
+  searchLine2: string;
+  summary: string;
+  videoName: string;
+  videoDistributionUrl: string;
+  videoHlsDistributionUrl: string;
+  videoMimeType: string;
+  videoThumbnailUrl: string;
+  videoCoverImageUrl: string;
+}
+
+export interface PersonOffer {
+  personOfferItemId: number;
+  personGuid: string | null;
+  offerItemId: number;
+  deliveryMethodId: number;
+  addr: null;
+  city: null;
+  state: null;
+  postalCode: null;
+  country: null;
+  fulfillmentTime: null;
+  fulfillmentLocation: null;
+  fulfillmentDuration: null;
+  commerceOrderId: number;
+  sqsMessageGuid: null;
+  createDate: string;
+  modDate: string;
+  offerDetails: [];
+  personOfferGuid: string;
+  tealiumId: null;
+  adobeId: string;
+  facebookTransactionId: null;
+  boncomCampaignId: string;
+  boncomTransactionId: string;
+  offerUrl: string;
+  referralId: number;
+  claimLeaderCmisId: null;
+  claimLeaderDate: null;
+  appId: number;
+  formTopicId: string;
+  submittingURL: string;
+  pageTitle: string;
+  findTypeId: null;
 }

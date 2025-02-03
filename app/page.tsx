@@ -18,7 +18,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://mission-api-v2.vercel.app/api/mission/cookies",
+        "http://localhost:3000/api/mission/cookies",
         {
           method: "POST",
           headers: {

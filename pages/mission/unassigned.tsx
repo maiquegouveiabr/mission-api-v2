@@ -2,16 +2,16 @@ import { Referral } from "@/interfaces";
 import UnassignedList from "@/components/UnassignedList";
 import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
-import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Title from "@/components/Title";
 import { useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import timestampToDate from "@/util/timestampToDate";
-import SyncIcon from "@mui/icons-material/Sync";
 import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
+import PhoneIcon from "@mui/icons-material/Phone";
 
 interface UnassignedProps {
   referrals: Referral[];
@@ -23,14 +23,11 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [dateState, setDateState] = useState(true);
   const [attemptsState, setAttemptsState] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [openOfferReferral, setOpenOfferReferral] = useState("");
 
   const handleSetFilterUBA = () => {
     const filtered = unassigned.filter((ref) => {
-      if (
-        ref.areaInfo &&
-        ref.areaInfo.organizations &&
-        ref.areaInfo.organizations[0].id === 31859
-      ) {
+      if (ref.areaInfo && ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) {
         return ref;
       }
     });
@@ -95,21 +92,11 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     console.log(ref);
     if (ref.areaInfo && ref.contactInfo) {
       try {
-        const text = `@${
-          ref.areaInfo.proselytingAreas
-            ? `${ref.areaInfo.proselytingAreas[0].name}`
-            : "AREA_PLACEHOLDER"
-        }\n${
-          ref.areaInfo.proselytingAreas
-            ? `*${ref.areaInfo.proselytingAreas[0].name}*`
-            : "*AREA_PLACEHOLDER*"
+        const text = `@${ref.areaInfo.proselytingAreas ? `${ref.areaInfo.proselytingAreas[0].name}` : "AREA_PLACEHOLDER"}\n${
+          ref.areaInfo.proselytingAreas ? `*${ref.areaInfo.proselytingAreas[0].name}*` : "*AREA_PLACEHOLDER*"
         }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${
-          ref.lastName
-            ? `*${ref.firstName} ${ref.lastName}*`
-            : `*${ref.firstName}*`
-        } - *OFERTA_PLACEHOLDER*\nNúmero: ${
-          ref.contactInfo.phoneNumbers[0].number
-        }\n*Cadastro em: ${timestampToDate(
+          ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`
+        } - *OFERTA_PLACEHOLDER*\nNúmero: ${ref.contactInfo.phoneNumbers[0].number}\n*Cadastro em: ${timestampToDate(
           new Date(ref.createDate).getTime(),
           true
         )}*\nAdicionamos uma tarefa como observação!`;
@@ -123,24 +110,18 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   const handleLoadData = async () => {
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const areaResponse = await fetch(
-      `https://mission-api-v2.vercel.app/api/referrals/areaInfoApi?refreshToken=${refreshToken}`,
-      {
-        method: "POST",
-        body: JSON.stringify(referrals),
-      }
-    );
+    const areaResponse = await fetch(`http://localhost:3000/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
+      method: "POST",
+      body: JSON.stringify(referrals),
+    });
     if (!areaResponse.ok) {
     } else {
       const referralsCompleteWithArea = await areaResponse.json();
       await sleep(3000);
-      const attemptsResponse = await fetch(
-        `https://mission-api-v2.vercel.app/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`,
-        {
-          method: "POST",
-          body: JSON.stringify(referralsCompleteWithArea),
-        }
-      );
+      const attemptsResponse = await fetch(`http://localhost:3000/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
+        method: "POST",
+        body: JSON.stringify(referralsCompleteWithArea),
+      });
       const referralsWithAttempts = await attemptsResponse.json();
       setDataLoaded(true);
       setUnassigned(referralsWithAttempts);
@@ -150,24 +131,45 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   const handleLoadReferralInfo = async (referral: Referral) => {
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const response = await fetch(
-      `https://mission-api-v2.vercel.app/api/referrals/referralInfoApi?refreshToken=${refreshToken}`,
-      {
-        method: "POST",
-        body: JSON.stringify(referral),
-      }
-    );
+    const response = await fetch(`http://localhost:3000/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+      method: "POST",
+      body: JSON.stringify(referral),
+    });
     const data = await response.json();
     const copyUnassigned = [...unassigned];
-    const index = copyUnassigned.findIndex(
-      (ref) => ref.personGuid === referral.personGuid
-    );
+    const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
     if (index !== -1) {
       copyUnassigned[index] = data;
     }
-    console.log(copyUnassigned);
     setFilteredUnassigned(copyUnassigned);
     setUnassigned(copyUnassigned);
+  };
+
+  const handleOfferItem = async (referral: Referral) => {
+    if (!referral.personOffer && !referral.offerItem) {
+      const refreshToken = localStorage.getItem("REFRESH_TOKEN");
+      const response = await fetch(`http://localhost:3000/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
+        method: "POST",
+        body: JSON.stringify(referral),
+      });
+      const referralWithOffer: Referral | null = await response.json();
+      const copyUnassigned = [...unassigned];
+      if (referralWithOffer) {
+        const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
+        if (index !== -1) {
+          copyUnassigned[index] = referralWithOffer;
+        }
+      }
+      setFilteredUnassigned(copyUnassigned);
+      setUnassigned(copyUnassigned);
+      setOpenOfferReferral(referral.personGuid);
+    } else {
+      if (openOfferReferral === referral.personGuid) {
+        setOpenOfferReferral("");
+      } else {
+        setOpenOfferReferral(referral.personGuid);
+      }
+    }
   };
 
   return (
@@ -181,23 +183,17 @@ export default function Unassigned({ referrals }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title
-            containerStyles={{ color: "#1976d2" }}
-            title={`Unassigned Referrals, (${filteredUnassigned.length})`}
-          />
+          <Title containerStyles={{ color: "#1976d2" }} title={`Unassigned Referrals, (${filteredUnassigned.length})`} />
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group">
-          {dataLoaded ? (
-            <>
-              <Button onClick={handleSetFilterUBA}>Uba</Button>
-              <Button onClick={handleSetAttempts}>
-                Attempts
-                <SwapVertIcon />
-              </Button>
-            </>
-          ) : (
-            <Button onClick={handleLoadData}>Load</Button>
+          {dataLoaded && <Button onClick={handleSetFilterUBA}>Uba</Button>}
+          {dataLoaded && (
+            <Button onClick={handleSetAttempts}>
+              Attempts
+              <SwapVertIcon />
+            </Button>
           )}
+          {!dataLoaded && <Button onClick={handleLoadData}>Load</Button>}
           <Button onClick={handleSetDate}>
             Date
             <SwapVertIcon />
@@ -211,27 +207,26 @@ export default function Unassigned({ referrals }: UnassignedProps) {
               key={filteredUnassigned.createDate}
               referral={filteredUnassigned}
               dataLoaded={dataLoaded}
+              openOfferReferral={openOfferReferral}
             />
-            {!filteredUnassigned.contactInfo && dataLoaded && (
-              <Button
-                onClick={() => handleLoadReferralInfo(filteredUnassigned)}
-                style={{ marginTop: "10px" }}
-                variant="contained"
-                endIcon={<SyncIcon />}
-              >
-                Contact Info
-              </Button>
-            )}
-            {dataLoaded && filteredUnassigned.contactInfo && (
-              <Button
-                onClick={() => handleClick(filteredUnassigned)}
-                style={{ marginTop: "10px" }}
-                variant="contained"
-                endIcon={<ContentPasteIcon />}
-              >
-                Copy
-              </Button>
-            )}
+            <ButtonGroup variant="outlined" aria-label="Basic button group">
+              {dataLoaded && filteredUnassigned.contactInfo && (
+                <Button onClick={() => handleClick(filteredUnassigned)} variant="contained" style={{ minHeight: "40px" }}>
+                  <ContentCopyIcon />
+                </Button>
+              )}
+              {!filteredUnassigned.contactInfo && dataLoaded && (
+                <Button onClick={() => handleLoadReferralInfo(filteredUnassigned)} variant="contained" style={{ minHeight: "40px" }}>
+                  <PhoneIcon />
+                </Button>
+              )}
+
+              {dataLoaded && (
+                <Button onClick={() => handleOfferItem(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
+                  Offer
+                </Button>
+              )}
+            </ButtonGroup>
           </div>
         ))}
       </UnassignedList>
