@@ -144,7 +144,12 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     if (index !== -1) {
       copyUnassigned[index] = data;
     }
-    setFilteredUnassigned(copyUnassigned);
+    const copyFiltered = [...filteredUnassigned];
+    const indexFiltered = copyFiltered.findIndex((ref) => ref.personGuid === referral.personGuid);
+    if (indexFiltered !== -1) {
+      copyFiltered[indexFiltered] = data;
+    }
+    setFilteredUnassigned(copyFiltered);
     setUnassigned(copyUnassigned);
   };
 
@@ -157,13 +162,18 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       });
       const referralWithOffer: Referral | null = await response.json();
       const copyUnassigned = [...unassigned];
+      const copyFiltered = [...filteredUnassigned];
       if (referralWithOffer) {
         const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
         if (index !== -1) {
           copyUnassigned[index] = referralWithOffer;
         }
+        const indexFiltered = copyFiltered.findIndex((ref) => ref.personGuid === referral.personGuid);
+        if (index !== -1) {
+          copyFiltered[indexFiltered] = referralWithOffer;
+        }
       }
-      setFilteredUnassigned(copyUnassigned);
+      setFilteredUnassigned(copyFiltered);
       setUnassigned(copyUnassigned);
       setOpenOfferReferral(referral.personGuid);
     } else {
@@ -175,12 +185,21 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     }
   };
 
+  const handleRooftop = () => {
+    const arr = unassigned.filter((ref) => {
+      if (!ref.areaInfo) return false;
+      if (ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) return false;
+      if (ref.areaInfo.actualMatchAccuracy === "Rooftop" && ref.areaInfo.actualConfidence === "HIGH") return true;
+    });
+    setFilteredUnassigned(arr);
+  };
+
   return (
     <div>
       <div className={styles.titleContainer}>
         <div
           style={{
-            width: "80%",
+            width: "50%",
             display: "flex",
             justifyContent: "flex-start",
             alignItems: "flex-start",
@@ -190,6 +209,12 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group">
           {dataLoaded && <Button onClick={handleSetFilterUBA}>Uba</Button>}
+          {dataLoaded && (
+            <Button onClick={handleRooftop}>
+              Rooftop
+              <SwapVertIcon />
+            </Button>
+          )}
           {dataLoaded && (
             <Button onClick={handleSetAttempts}>
               Attempts
