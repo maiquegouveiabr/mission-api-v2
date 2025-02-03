@@ -26,7 +26,8 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [openOfferReferral, setOpenOfferReferral] = useState("");
 
   const handleSetFilterUBA = () => {
-    const filtered = unassigned.filter((ref) => {
+    const copyUnassigned = [...unassigned];
+    const filtered = copyUnassigned.filter((ref) => {
       if (ref.areaInfo && ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) {
         return ref;
       }
@@ -35,9 +36,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleSetDate = () => {
+    const copyUnassigned = [...unassigned];
     setDateState(!dateState);
     if (dateState) {
-      const filtered = unassigned.sort((a, b) => {
+      const filtered = copyUnassigned.sort((a, b) => {
         if (a.createDate < b.createDate) {
           return -1;
         }
@@ -48,7 +50,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       });
       setFilteredUnassigned(filtered);
     } else {
-      const filtered = unassigned.sort((a, b) => {
+      const filtered = copyUnassigned.sort((a, b) => {
         if (b.createDate < a.createDate) {
           return -1;
         }
@@ -62,9 +64,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleSetAttempts = () => {
+    const copyUnassigned = [...unassigned];
     setAttemptsState(!attemptsState);
     if (attemptsState) {
-      const filtered = unassigned.sort((a, b) => {
+      const filtered = copyUnassigned.sort((a, b) => {
         if (a.contactAttempts.length < b.contactAttempts.length) {
           return -1;
         }
@@ -75,7 +78,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       });
       setFilteredUnassigned(filtered);
     } else {
-      const filtered = unassigned.sort((a, b) => {
+      const filtered = copyUnassigned.sort((a, b) => {
         if (b.contactAttempts.length < a.contactAttempts.length) {
           return -1;
         }
@@ -89,7 +92,6 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleClick = async (ref: Referral) => {
-    console.log(ref);
     if (ref.areaInfo && ref.contactInfo) {
       try {
         const text = `@${ref.areaInfo.proselytingAreas ? `${ref.areaInfo.proselytingAreas[0].name}` : "AREA_PLACEHOLDER"}\n${
@@ -149,6 +151,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     if (indexFiltered !== -1) {
       copyFiltered[indexFiltered] = data;
     }
+
     setFilteredUnassigned(copyFiltered);
     setUnassigned(copyUnassigned);
   };
@@ -156,7 +159,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const handleOfferItem = async (referral: Referral) => {
     if (!referral.personOffer && !referral.offerItem) {
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-      const response = await fetch(`https://mission-api-v2.vercel.app/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
+      const response = await fetch(`http://localhost:3000/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
         method: "POST",
         body: JSON.stringify(referral),
       });
@@ -186,7 +189,8 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleRooftop = () => {
-    const arr = unassigned.filter((ref) => {
+    const filtered = [...unassigned];
+    const arr = filtered.filter((ref) => {
       if (!ref.areaInfo) return false;
       if (ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) return false;
       if (ref.areaInfo.actualMatchAccuracy === "Rooftop" && ref.areaInfo.actualConfidence === "HIGH") return true;
@@ -230,9 +234,9 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       </div>
       <UnassignedList>
         {filteredUnassigned.map((filteredUnassigned) => (
-          <div key={filteredUnassigned.createDate}>
+          <div key={filteredUnassigned.personGuid}>
             <ReferralItem
-              key={filteredUnassigned.createDate}
+              key={filteredUnassigned.personGuid}
               referral={filteredUnassigned}
               dataLoaded={dataLoaded}
               openOfferReferral={openOfferReferral}

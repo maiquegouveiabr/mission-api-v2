@@ -17,20 +17,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       String(refreshToken)
     );
     if (referralInfo[0]) {
-      const contactAttempts = referral.contactAttempts;
-      const areaInfo = referral.areaInfo;
-      const address = referral.address;
-      const personGuid = referral.personGuid;
-      const offerItem = referral.offerItem;
-      const personOffer = referral.personOffer;
       res.send({
-        ...referralInfo[0].person,
-        contactAttempts,
-        areaInfo,
-        address,
-        personGuid,
-        offerItem,
-        personOffer,
+        ...referral,
+        contactInfo: referralInfo[0].person.contactInfo,
       });
     } else {
       res.send(referral);
