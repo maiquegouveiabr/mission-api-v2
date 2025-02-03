@@ -17,16 +17,13 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/mission/cookies",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
+      const response = await fetch("https://mission-api-v2.vercel.app/api/mission/cookies", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
       if (!response.ok) {
         throw new Error("Login failed");
@@ -34,11 +31,8 @@ const Login: React.FC = () => {
 
       const cookies: Cookie[] = await response.json();
       if (cookies) {
-        const REFRESH_TOKEN = cookies.find(
-          (cookie) => cookie.name === "oauth-abw_refresh_token"
-        );
-        if (REFRESH_TOKEN)
-          localStorage.setItem("REFRESH_TOKEN", REFRESH_TOKEN.value);
+        const REFRESH_TOKEN = cookies.find((cookie) => cookie.name === "oauth-abw_refresh_token");
+        if (REFRESH_TOKEN) localStorage.setItem("REFRESH_TOKEN", REFRESH_TOKEN.value);
         router.push(`/mission/unassigned?refreshToken=${REFRESH_TOKEN?.value}`); // Change the path as needed
       }
     } catch (error) {

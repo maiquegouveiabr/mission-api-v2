@@ -110,7 +110,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   const handleLoadData = async () => {
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const areaResponse = await fetch(`http://localhost:3000/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
+    const areaResponse = await fetch(`https://mission-api-v2.vercel.app/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
       method: "POST",
       body: JSON.stringify(referrals),
     });
@@ -118,10 +118,13 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     } else {
       const referralsCompleteWithArea = await areaResponse.json();
       await sleep(3000);
-      const attemptsResponse = await fetch(`http://localhost:3000/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
-        method: "POST",
-        body: JSON.stringify(referralsCompleteWithArea),
-      });
+      const attemptsResponse = await fetch(
+        `https://mission-api-v2.vercel.app/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`,
+        {
+          method: "POST",
+          body: JSON.stringify(referralsCompleteWithArea),
+        }
+      );
       const referralsWithAttempts = await attemptsResponse.json();
       setDataLoaded(true);
       setUnassigned(referralsWithAttempts);
@@ -131,7 +134,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   const handleLoadReferralInfo = async (referral: Referral) => {
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const response = await fetch(`http://localhost:3000/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+    const response = await fetch(`https://mission-api-v2.vercel.app/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
       method: "POST",
       body: JSON.stringify(referral),
     });
@@ -148,7 +151,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const handleOfferItem = async (referral: Referral) => {
     if (!referral.personOffer && !referral.offerItem) {
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-      const response = await fetch(`http://localhost:3000/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
+      const response = await fetch(`https://mission-api-v2.vercel.app/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
         method: "POST",
         body: JSON.stringify(referral),
       });
