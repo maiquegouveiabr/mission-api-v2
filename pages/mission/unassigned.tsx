@@ -4,7 +4,7 @@ import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Title from "@/components/Title";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -12,6 +12,7 @@ import timestampToDate from "@/util/timestampToDate";
 import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
+import icon from "@/img/icon.png";
 
 interface UnassignedProps {
   referrals: Referral[];
@@ -24,6 +25,20 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [attemptsState, setAttemptsState] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [openOfferReferral, setOpenOfferReferral] = useState("");
+
+  useEffect(() => {
+    document.title = "Dragon Ball - Referral Manager";
+    const link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (link) {
+      link.href = icon.src;
+      link.className = styles.icon;
+    } else {
+      const newLink = document.createElement("link");
+      newLink.rel = "icon";
+      newLink.href = icon.src;
+      document.head.appendChild(newLink);
+    }
+  });
 
   const handleSetFilterUBA = () => {
     const copyUnassigned = [...unassigned];
@@ -111,8 +126,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleLoadData = async () => {
+    const isDev = process.env.NODE_ENV === "development";
+    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const areaResponse = await fetch(`https://mission-api-v2.vercel.app/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
+    const areaResponse = await fetch(`${url}/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
       method: "POST",
       body: JSON.stringify(referrals),
     });
@@ -120,13 +137,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     } else {
       const referralsCompleteWithArea = await areaResponse.json();
       await sleep(3000);
-      const attemptsResponse = await fetch(
-        `https://mission-api-v2.vercel.app/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`,
-        {
-          method: "POST",
-          body: JSON.stringify(referralsCompleteWithArea),
-        }
-      );
+      const attemptsResponse = await fetch(`${url}/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
+        method: "POST",
+        body: JSON.stringify(referralsCompleteWithArea),
+      });
       const referralsWithAttempts = await attemptsResponse.json();
       setDataLoaded(true);
       setUnassigned(referralsWithAttempts);
@@ -135,8 +149,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleLoadReferralInfo = async (referral: Referral) => {
+    const isDev = process.env.NODE_ENV === "development";
+    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
     const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const response = await fetch(`https://mission-api-v2.vercel.app/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+    const response = await fetch(`${url}/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
       method: "POST",
       body: JSON.stringify(referral),
     });
@@ -158,8 +174,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   const handleOfferItem = async (referral: Referral) => {
     if (!referral.personOffer && !referral.offerItem) {
+      const isDev = process.env.NODE_ENV === "development";
+      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-      const response = await fetch(`https://mission-api-v2.vercel.app/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
+      const response = await fetch(`${url}/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
         method: "POST",
         body: JSON.stringify(referral),
       });
@@ -199,7 +217,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.titleContainer}>
         <div
           style={{
@@ -269,11 +287,9 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { refreshToken } = context.query;
   const isDev = process.env.NODE_ENV === "development";
-  const url = isDev
-    ? `http://localhost:3000/api/referrals/unassigned?refreshToken=${refreshToken}`
-    : `https://mission-api-v2.vercel.app/api/referrals/unassigned?refreshToken=${refreshToken}`;
+  const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
   try {
-    const response = await fetch(url);
+    const response = await fetch(`${url}/api/referrals/unassigned?refreshToken=${refreshToken}`);
     const referrals = await response.json();
     return {
       props: { referrals },

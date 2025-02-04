@@ -13,19 +13,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `https://referralmanager.churchofjesuschrist.org/services/progress/timeline/${ref.personGuid}`,
         String(refreshToken)
       );
-      const latestNewReferral =
-        contactAttempts.find(
-          ({ timelineItemType }) => timelineItemType === "NEW_REFERRAL"
-        ) || null;
+      const latestNewReferral = contactAttempts.find(({ timelineItemType }) => timelineItemType === "NEW_REFERRAL") || null;
 
       if (latestNewReferral) {
         const filteredAttempts = filterUniqueEvent(
           contactAttempts.filter(
-            ({ itemDate, eventStatus, timelineItemType }) =>
-              itemDate > latestNewReferral.itemDate &&
-              eventStatus === false &&
-              (timelineItemType === "CONTACT" ||
-                timelineItemType === "TEACHING")
+            ({ itemDate, timelineItemType }) =>
+              itemDate > latestNewReferral.itemDate && (timelineItemType === "CONTACT" || timelineItemType === "TEACHING")
           ) || []
         );
         return {

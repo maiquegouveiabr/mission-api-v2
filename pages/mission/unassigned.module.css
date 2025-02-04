@@ -5,3 +5,17 @@
   align-items: center;
   margin-bottom: 1rem;
 }
+
+.title {
+  font-weight: bold;
+  font-family: "Courier New", Courier, monospace;
+  color: #1976d2;
+}
+
+.container {
+}
+
+body {
+  background-color: #ccc;
+  margin: 0;
+}

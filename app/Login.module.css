@@ -2,16 +2,28 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-
+  background-image: url("../img/Dragon\ Ball\ Z\ 4K\ Wallpaper.png");
+  background-size: cover;
+  background-repeat: no-repeat;
   width: 100%;
   height: 100vh;
   align-items: center;
 }
 
-.label {
-  font-size: 16px;
+.labelContainer {
+  background-color: rgb(107, 107, 107);
+  padding: 8px;
   margin-bottom: 5px;
-  color: black;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border-radius: 5px;
+}
+
+.label {
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
 }
 
 .input {
@@ -19,8 +31,23 @@
   padding: 10px;
   margin-bottom: 15px;
   border-width: 1px;
-  border-color: #ccc;
+  border-color: rgb(107, 107, 107);
   border-radius: 5px;
   background-color: #fff;
-  color: black;
+  color: rgb(107, 107, 107);
+}
+
+.loginButton {
+  width: 25%;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
 }
