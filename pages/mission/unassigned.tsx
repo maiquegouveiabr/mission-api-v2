@@ -13,6 +13,7 @@ import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
 import icon from "@/img/icon.png";
+import "../../app/globals.css";
 
 interface UnassignedProps {
   referrals: Referral[];
