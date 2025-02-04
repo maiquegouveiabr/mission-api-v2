@@ -159,7 +159,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const handleOfferItem = async (referral: Referral) => {
     if (!referral.personOffer && !referral.offerItem) {
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-      const response = await fetch(`http://localhost:3000/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
+      const response = await fetch(`ttps://mission-api-v2.vercel.app/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
         method: "POST",
         body: JSON.stringify(referral),
       });
