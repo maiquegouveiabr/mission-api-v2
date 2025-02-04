@@ -29,26 +29,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           String(refreshToken)
         );
         if (contactAttempts) {
-          const latestNewReferral =
-            contactAttempts.find(
-              ({ timelineItemType }) => timelineItemType === "NEW_REFERRAL"
-            ) || null;
-
-          if (latestNewReferral) {
-            const filteredAttempts = filterUniqueEvent(
-              contactAttempts.filter(
-                ({ itemDate, eventStatus, timelineItemType }) =>
-                  itemDate > latestNewReferral.itemDate &&
-                  eventStatus === false &&
-                  (timelineItemType === "CONTACT" ||
-                    timelineItemType === "TEACHING")
-              ) || []
-            );
-            return {
-              ...ref,
-              contactAttempts: filteredAttempts,
-            };
-          }
+          const filteredAttempts = filterUniqueEvent(
+            contactAttempts.filter(({ timelineItemType }) => timelineItemType === "CONTACT" || timelineItemType === "TEACHING") || []
+          );
+          return {
+            ...ref,
+            contactAttempts: filteredAttempts,
+          };
         }
         return ref;
       })
