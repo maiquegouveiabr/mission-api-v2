@@ -61,13 +61,10 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
     setSending(true);
     const isDev = process.env.NODE_ENV === "development";
     const url = `${isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app"}`;
-    const response = await fetch(`${url}/api/db/references`, {
+    await fetch(`${url}/api/db/references`, {
       method: "POST",
       body: JSON.stringify(data),
     });
-
-    const createdData = await response.json();
-    console.log(createdData);
 
     setSending(false);
     handleClose();
