@@ -442,3 +442,9 @@ export interface PersonOffer {
   pageTitle: string;
   findTypeId: null;
 }
+
+export interface Area {
+  id: number;
+  name: string;
+  zone_id: number;
+}

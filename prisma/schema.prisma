@@ -42,7 +42,27 @@ model zone {
   zone_id              Int                    @id(map: "Zone_pkey") @default(autoincrement())
   name                 String                 @db.VarChar(255)
   create_date          DateTime               @default(now()) @db.Timestamp(6)
+  area                 area[]
   baptism              baptism[]
   referral             referral[]
   uncontacted_referral uncontacted_referral[]
+}
+
+model area {
+  id        Int         @id
+  name      String
+  zone_id   Int
+  zone      zone        @relation(fields: [zone_id], references: [zone_id], onDelete: Cascade, onUpdate: NoAction)
+  reference reference[]
+}
+
+model reference {
+  id        String   @id
+  sent_date DateTime @default(now()) @db.Timestamp(6)
+  name      String
+  area_id   Int
+  other     String?
+  who_sent  String
+  offer     String?
+  area      area     @relation(fields: [area_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }

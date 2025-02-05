@@ -1,4 +1,4 @@
-import { Referral } from "@/interfaces";
+import { Area, Referral } from "@/interfaces";
 import UnassignedList from "@/components/UnassignedList";
 import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
@@ -14,6 +14,8 @@ import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
 import icon from "@/img/icon.png";
 import "../../app/globals.css";
+import SimpleDialog from "@/components/SimpleDialog";
+import SendIcon from "@mui/icons-material/Send";
 
 interface UnassignedProps {
   referrals: Referral[];
@@ -26,6 +28,9 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [attemptsState, setAttemptsState] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [openOfferReferral, setOpenOfferReferral] = useState("");
+  const [areas, setAreas] = useState<Area[] | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentReferral, setCurrentReferral] = useState<{ id: string; name: string }>({ id: "", name: "" });
 
   useEffect(() => {
     document.title = "Dragon Ball - Referral Manager";
@@ -39,7 +44,19 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       newLink.href = icon.src;
       document.head.appendChild(newLink);
     }
-  });
+  }, []);
+
+  useEffect(() => {
+    fetchAreas();
+  }, []);
+
+  const fetchAreas = async () => {
+    const isDev = process.env.NODE_ENV === "development";
+    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
+    const response = await fetch(`${url}/api/db/areas`);
+    const data = await response.json();
+    setAreas(data);
+  };
 
   const handleSetFilterUBA = () => {
     const copyUnassigned = [...unassigned];
@@ -217,8 +234,25 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     setFilteredUnassigned(arr);
   };
 
+  const handleOpenDialog = (referral: Referral) => {
+    setCurrentReferral({
+      id: referral.personGuid,
+      name: `${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`,
+    });
+    setDialogOpen(true);
+  };
+
   return (
     <div className={styles.container}>
+      <SimpleDialog
+        data={areas ? areas : []}
+        open={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setCurrentReferral({ id: "", name: "" });
+        }}
+        currentReferral={currentReferral}
+      />
       <div className={styles.titleContainer}>
         <div
           style={{
@@ -275,6 +309,11 @@ export default function Unassigned({ referrals }: UnassignedProps) {
               {dataLoaded && (
                 <Button onClick={() => handleOfferItem(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
                   Offer
+                </Button>
+              )}
+              {dataLoaded && (
+                <Button onClick={() => handleOpenDialog(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
+                  <SendIcon />
                 </Button>
               )}
             </ButtonGroup>
