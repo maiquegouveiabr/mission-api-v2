@@ -30,7 +30,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [openOfferReferral, setOpenOfferReferral] = useState("");
   const [areas, setAreas] = useState<Area[] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentReferral, setCurrentReferral] = useState<{ id: string; name: string }>({ id: "", name: "" });
+  const [currentReferral, setCurrentReferral] = useState<{ id: string; name: string; phone: string }>({ id: "", name: "", phone: "" });
 
   useEffect(() => {
     document.title = "Dragon Ball - Referral Manager";
@@ -238,6 +238,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     setCurrentReferral({
       id: referral.personGuid,
       name: `${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`,
+      phone: referral.contactInfo ? referral.contactInfo.phoneNumbers[0].number : "",
     });
     setDialogOpen(true);
   };
@@ -249,7 +250,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         open={dialogOpen}
         onClose={() => {
           setDialogOpen(false);
-          setCurrentReferral({ id: "", name: "" });
+          setCurrentReferral({ id: "", name: "", phone: "" });
         }}
         currentReferral={currentReferral}
       />
@@ -311,7 +312,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
                   Offer
                 </Button>
               )}
-              {dataLoaded && (
+              {dataLoaded && filteredUnassigned.contactInfo && (
                 <Button onClick={() => handleOpenDialog(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
                   <SendIcon />
                 </Button>

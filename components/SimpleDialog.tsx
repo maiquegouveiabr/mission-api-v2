@@ -15,6 +15,7 @@ interface SimpleDialogProps {
   currentReferral: {
     name: string;
     id: string;
+    phone: string;
   };
 }
 
@@ -31,7 +32,7 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
 
   useEffect(() => {
     setReferralName(currentReferral.name);
-  }, [currentReferral.name, currentReferral.id]);
+  }, [currentReferral.name, currentReferral.id, currentReferral.phone]);
 
   const handleSend = async () => {
     const name = currentReferral.name.trim();
@@ -56,6 +57,7 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
       other: otherText,
       area_id: area,
       offer: offerText,
+      phone: currentReferral.phone,
     };
 
     setSending(true);
