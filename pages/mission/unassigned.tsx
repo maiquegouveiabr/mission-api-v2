@@ -234,13 +234,26 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     setFilteredUnassigned(arr);
   };
 
-  const handleOpenDialog = (referral: Referral) => {
-    setCurrentReferral({
-      id: referral.personGuid,
-      name: `${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`,
-      phone: referral.contactInfo ? referral.contactInfo.phoneNumbers[0].number : "",
-    });
-    setDialogOpen(true);
+  const handleOpenDialog = async (referral: Referral) => {
+    try {
+      const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
+      const response = await fetch(`${API_URL}/api/db/referralExist?id=${referral.personGuid}`);
+      if (!response.ok) throw new Error(`${response.statusText}`);
+      const sent: boolean = await response.json();
+      if (sent) {
+        alert("This referral was sent by someone else.");
+        return;
+      }
+      setCurrentReferral({
+        id: referral.personGuid,
+        name: `${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`,
+        phone: referral.contactInfo ? referral.contactInfo.phoneNumbers[0].number : "",
+      });
+      setDialogOpen(true);
+    } catch (error) {
+      console.error(error);
+      alert("INTERNAL_SERVER_ERROR");
+    }
   };
 
   return (
