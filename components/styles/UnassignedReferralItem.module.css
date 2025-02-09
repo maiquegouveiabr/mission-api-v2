@@ -23,3 +23,12 @@
   font-weight: 600;
   color: blueviolet;
 }
+
+.wrap {
+  display: flex;
+  align-items: center;
+}
+
+.wrap a {
+  margin-right: 10px;
+}

@@ -2,6 +2,8 @@ import { Referral } from "@/interfaces";
 import styles from "./styles/UnassignedReferralItem.module.css";
 import timestampToDate from "@/util/timestampToDate";
 import Offer from "./Offer";
+import WarningIcon from "@mui/icons-material/Warning";
+import checkTimestampToday from "@/util/checkTimestampToday";
 
 interface UnassignedReferralItemProps {
   referral: Referral;
@@ -13,16 +15,20 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
   return (
     <div className={styles.container}>
       <li>
-        <a
-          className={styles.linkItem}
-          target="_blank"
-          href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}
-        >
-          <p className={styles.spanItem}>
-            {referral.firstName} {referral.lastName ? referral.lastName : ""}
-          </p>
-        </a>
-        <br />
+        <div className={styles.wrap}>
+          <a
+            className={styles.linkItem}
+            target="_blank"
+            href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}
+          >
+            <p className={styles.spanItem}>
+              {referral.firstName} {referral.lastName ? referral.lastName : ""}
+            </p>
+          </a>
+          {referral.contactAttempts.length >= 2 &&
+            !checkTimestampToday(referral.contactAttempts[referral.contactAttempts.length - 1].itemDate) && <WarningIcon color="warning" />}
+        </div>
+
         <span className={styles.spanItem}>{timestampToDate(new Date(referral.createDate).getTime(), true)}</span>
         <br />
         {referral.contactInfo && (
