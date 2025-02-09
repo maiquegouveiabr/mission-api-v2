@@ -2,7 +2,7 @@ import { Referral } from "@/interfaces";
 import styles from "./styles/UnassignedReferralItem.module.css";
 import timestampToDate from "@/util/timestampToDate";
 import Offer from "./Offer";
-import WarningIcon from "@mui/icons-material/Warning";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import checkTimestampToday from "@/util/checkTimestampToday";
 
 interface UnassignedReferralItemProps {
@@ -26,8 +26,10 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
             </p>
           </a>
           {referral.contactAttempts &&
-            referral.contactAttempts.length >= 2 &&
-            !checkTimestampToday(referral.contactAttempts[referral.contactAttempts.length - 1].itemDate) && <WarningIcon color="warning" />}
+          referral.contactAttempts.length >= 2 &&
+          !checkTimestampToday(referral.contactAttempts[0].itemDate) ? (
+            <ErrorOutlineIcon color="warning" />
+          ) : null}
         </div>
 
         <span className={styles.spanItem}>{timestampToDate(new Date(referral.createDate).getTime(), true)}</span>
