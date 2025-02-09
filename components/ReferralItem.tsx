@@ -25,7 +25,8 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
               {referral.firstName} {referral.lastName ? referral.lastName : ""}
             </p>
           </a>
-          {referral.contactAttempts.length >= 2 &&
+          {referral.contactAttempts &&
+            referral.contactAttempts.length >= 2 &&
             !checkTimestampToday(referral.contactAttempts[referral.contactAttempts.length - 1].itemDate) && <WarningIcon color="warning" />}
         </div>
 
