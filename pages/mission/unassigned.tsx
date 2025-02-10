@@ -30,7 +30,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [openOfferReferral, setOpenOfferReferral] = useState("");
   const [areas, setAreas] = useState<Area[] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentReferral, setCurrentReferral] = useState<{ id: string; name: string; phone: string }>({ id: "", name: "", phone: "" });
+  const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
 
   useEffect(() => {
     document.title = "Dragon Ball - Referral Manager";
@@ -244,11 +244,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         alert("This referral was sent by someone else.");
         return;
       }
-      setCurrentReferral({
-        id: referral.personGuid,
-        name: `${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`,
-        phone: referral.contactInfo ? referral.contactInfo.phoneNumbers[0].number : "",
-      });
+      setCurrentReferral(referral);
       setDialogOpen(true);
     } catch (error) {
       console.error(error);
@@ -258,15 +254,17 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
   return (
     <div className={styles.container}>
-      <SimpleDialog
-        data={areas ? areas : []}
-        open={dialogOpen}
-        onClose={() => {
-          setDialogOpen(false);
-          setCurrentReferral({ id: "", name: "", phone: "" });
-        }}
-        currentReferral={currentReferral}
-      />
+      {currentReferral && (
+        <SimpleDialog
+          data={areas ? areas : []}
+          open={dialogOpen}
+          onClose={() => {
+            setDialogOpen(false);
+            setCurrentReferral(null);
+          }}
+          referral={currentReferral}
+        />
+      )}
       <div className={styles.titleContainer}>
         <div
           style={{

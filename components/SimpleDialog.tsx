@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import Selector from "@/components/Selector";
-import { Area } from "@/interfaces";
+import { Area, Referral } from "@/interfaces";
 import { SelectChangeEvent } from "@mui/material";
 import DisabledByDefaultOutlinedIcon from "@mui/icons-material/DisabledByDefaultOutlined";
 import styles from "@/components/styles/SimpleDialog.module.css";
@@ -12,30 +12,32 @@ interface SimpleDialogProps {
   open: boolean;
   onClose: () => void;
   data: Area[];
-  currentReferral: {
-    name: string;
-    id: string;
-    phone: string;
-  };
+  referral: Referral;
 }
 
-export default function SimpleDialog({ onClose, data, open, currentReferral }: SimpleDialogProps) {
+export default function SimpleDialog({ onClose, data, open, referral }: SimpleDialogProps) {
   const [areaId, setAreaId] = useState(1000);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
   const [sender, setSender] = useState("");
-  const [referralName, setReferralName] = useState(currentReferral.name);
+  const [referralName, setReferralName] = useState(`${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`);
   const [sending, setSending] = useState(false);
   const handleSelectorChange = (event: SelectChangeEvent<number>) => {
     setAreaId(Number(event.target.value));
   };
 
   useEffect(() => {
-    setReferralName(currentReferral.name);
-  }, [currentReferral.name, currentReferral.id, currentReferral.phone]);
+    if (referral.areaInfo && referral.areaInfo.bestProsAreaId) {
+      if (referral.areaInfo.missions && referral.areaInfo.missions[0].id !== 14319) {
+        setAreaId(1);
+        setOther(referral.areaInfo.missions[0].name);
+      } else if (referral.areaInfo.bestProsAreaId === 500625799) setAreaId(0);
+      else setAreaId(referral.areaInfo.bestProsAreaId);
+    }
+  }, [referral.areaInfo]);
 
   const handleSend = async () => {
-    const name = currentReferral.name.trim();
+    const name = referralName.trim();
     const offerText = offer.trim();
     const senderText = sender.trim();
     const area = areaId;
@@ -51,13 +53,13 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
       }
     }
     const data = {
-      id: currentReferral.id,
+      id: referral.personGuid,
       name,
       who_sent: senderText,
       other: otherText,
       area_id: area,
       offer: offerText,
-      phone: currentReferral.phone,
+      phone: referral.phone,
     };
 
     setSending(true);
@@ -82,7 +84,7 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
   };
 
   return (
-    <Dialog open={open} key={currentReferral.id}>
+    <Dialog open={open} key={referral.personGuid}>
       <div className={styles.titleContainer}>
         <h2 className={styles.title}>Save Referral</h2>
         <DisabledByDefaultOutlinedIcon onClick={handleClose} cursor="pointer" fontSize="large" color="warning" />
@@ -99,7 +101,6 @@ export default function SimpleDialog({ onClose, data, open, currentReferral }: S
         />
         <TextField
           required
-          inputMode="none"
           autoComplete="false"
           id="outlined-basic"
           label="Offer"
