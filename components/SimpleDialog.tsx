@@ -59,7 +59,7 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
       other: otherText,
       area_id: area,
       offer: offerText,
-      phone: referral.phone,
+      phone: referral.contactInfo?.phoneNumbers[0].number,
     };
 
     setSending(true);
