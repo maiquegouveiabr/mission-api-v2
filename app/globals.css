@@ -3,18 +3,15 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-  }
+html,
+body {
+  margin: 0;
+  height: 100%;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
+  color: var(--foreground);
 }
 
 @media (prefers-color-scheme: dark) {

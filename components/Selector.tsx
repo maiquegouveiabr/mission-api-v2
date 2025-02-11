@@ -5,7 +5,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Area } from "@/interfaces";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -26,7 +25,7 @@ function getStyles(name: string, personName: string[], theme: Theme) {
 
 interface SelectorProps {
   inputLabel: string;
-  data: Area[];
+  data: any[];
   currentValue: number;
   onChange: (event: SelectChangeEvent<number>) => void;
 }

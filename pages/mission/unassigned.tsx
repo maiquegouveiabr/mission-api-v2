@@ -12,7 +12,7 @@ import timestampToDate from "@/util/timestampToDate";
 import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
-import icon from "@/img/icon.png";
+import icon from "@/img/naruto-icon.png";
 import "../../app/globals.css";
 import SimpleDialog from "@/components/SimpleDialog";
 import SendIcon from "@mui/icons-material/Send";
@@ -33,7 +33,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
 
   useEffect(() => {
-    document.title = "Dragon Ball - Referral Manager";
+    document.title = "Shrek Plus - Referral Manager";
     const link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
     if (link) {
       link.href = icon.src;

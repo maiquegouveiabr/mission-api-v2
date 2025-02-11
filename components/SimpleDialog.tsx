@@ -15,15 +15,30 @@ interface SimpleDialogProps {
   referral: Referral;
 }
 
+const WHO_DATA = [
+  { id: 1, name: "Pilarzinho C" },
+  { id: 2, name: "Pilarzinho H" },
+  { id: 3, name: "Elder Gouveia" },
+  { id: 4, name: "Elder Bentes" },
+  { id: 5, name: "Capão" },
+  { id: 6, name: "Boa Vista" },
+  { id: 7, name: "Jd. das Américas" },
+  { id: 8, name: "Cachoeira 1" },
+];
+
 export default function SimpleDialog({ onClose, data, open, referral }: SimpleDialogProps) {
   const [areaId, setAreaId] = useState(1000);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
-  const [sender, setSender] = useState("");
+  const [sender, setSender] = useState(0);
   const [referralName, setReferralName] = useState(`${referral.firstName}${referral.lastName ? " " + referral.lastName : ""}`);
   const [sending, setSending] = useState(false);
+
   const handleSelectorChange = (event: SelectChangeEvent<number>) => {
     setAreaId(Number(event.target.value));
+  };
+  const handleSelectorChangeWho = (event: SelectChangeEvent<number>) => {
+    setSender(Number(event.target.value));
   };
 
   useEffect(() => {
@@ -39,11 +54,10 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
   const handleSend = async () => {
     const name = referralName.trim();
     const offerText = offer.trim();
-    const senderText = sender.trim();
     const area = areaId;
     const otherText = other.trim();
 
-    if (!name || !offerText || !sender || area === 1000) {
+    if (!name || !offerText || sender === 0 || area === 1000) {
       alert("Bruh, don't forget any fields!");
       return;
     } else {
@@ -55,7 +69,7 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
     const data = {
       id: referral.personGuid,
       name,
-      who_sent: senderText,
+      who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
       other: otherText,
       area_id: area,
       offer: offerText,
@@ -78,7 +92,7 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
     setAreaId(1000);
     setOffer("");
     setOther("");
-    setSender("");
+    setSender(0);
     setSending(false);
     onClose();
   };
@@ -108,15 +122,7 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
           value={offer}
           onChange={(event) => setOffer(event.target.value)}
         />
-        <TextField
-          required
-          autoComplete="false"
-          id="outlined-basic"
-          label="Who Sending"
-          variant="outlined"
-          value={sender}
-          onChange={(event) => setSender(event.target.value)}
-        />
+        <Selector onChange={handleSelectorChangeWho} currentValue={sender} inputLabel="Who" data={WHO_DATA} />
         <Selector onChange={handleSelectorChange} currentValue={areaId} inputLabel="Area" data={data} />
         {(areaId === 0 || areaId === 1) && (
           <TextField

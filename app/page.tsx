@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 import { Cookie } from "puppeteer";
-import icon from "@/img/icon.png";
+import icon from "@/img/naruto-icon.png";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    document.title = "Dragon Ball - Referral Manager";
+    document.title = "Shrek Plus - Referral Manager";
     const link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
     if (link) {
       link.href = icon.src;
