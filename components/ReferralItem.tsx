@@ -29,7 +29,9 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
           referral.contactAttempts.length >= 2 &&
           !checkTimestampToday(referral.contactAttempts[0].itemDate) ? (
             <ErrorOutlineIcon color="warning" />
-          ) : null}
+          ) : (
+            referral.contactAttempts && referral.contactAttempts.length >= 3 && <ErrorOutlineIcon color="warning" />
+          )}
         </div>
 
         <span className={styles.spanItem}>{timestampToDate(new Date(referral.createDate).getTime(), true)}</span>
