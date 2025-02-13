@@ -1,14 +1,36 @@
-import { Referral } from "@/interfaces";
+import { ContactAttempt, Referral } from "@/interfaces";
 import fetchData from "@/util/api/fetchData";
+import filterUncontactedReferrals from "@/util/filterUncontactedReferrals";
+import organizeEvents from "@/util/organizeEvents";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const BOA_VISTA_COLOMBO = 500387154;
-const PONTA_GROSSA_CAMPOS_GERAIS = 500427238;
-const TARUMÃ_PINHAIS = 500427239;
-const IGUAÇU_CAMPO_COMPRIDO = 500483702;
-const SÃO_LOURENÇO_CURITIBA = 500393700;
-const PONTA_GROSSA_NORTE = 500251576;
-const APS = 500625797;
+const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
+
+const processReferralsWithAttempts = async (referrals: Referral[], refreshToken: string) => {
+  return Promise.all(
+    referrals.map(async (ref) => {
+      let contactAttempts: ContactAttempt[] = await fetchData(
+        `https://referralmanager.churchofjesuschrist.org/services/progress/timeline/${ref.personGuid}`,
+        refreshToken
+      );
+      let latestNewReferral = contactAttempts.find(({ timelineItemType }) => timelineItemType === "NEW_REFERRAL");
+      if (!latestNewReferral) return;
+      let filteredAttempts = organizeEvents(
+        contactAttempts.filter(
+          ({ itemDate, eventStatus, timelineItemType }) =>
+            itemDate > latestNewReferral.itemDate &&
+            eventStatus === false &&
+            (timelineItemType === "CONTACT" || timelineItemType === "TEACHING")
+        ) || []
+      );
+      return {
+        ...ref,
+        contactAttempts: filteredAttempts,
+        referralTimestamp: latestNewReferral.itemDate,
+      };
+    })
+  );
+};
 
 export default async function Uncontacted(req: NextApiRequest, res: NextApiResponse) {
   const { refreshToken } = req.query;
@@ -18,6 +40,8 @@ export default async function Uncontacted(req: NextApiRequest, res: NextApiRespo
       message: "refreshToken was not provided",
     });
   } else {
+    const response = await fetch(`${API_URL}/api/mission/areas?refreshToken=${refreshToken}`);
+    const areasData = await response.json();
     const data = await fetchData("https://referralmanager.churchofjesuschrist.org/services/people/mission/14319", String(refreshToken));
     if (!data) {
       res.status(500).json({
@@ -26,11 +50,8 @@ export default async function Uncontacted(req: NextApiRequest, res: NextApiRespo
         message: "INTERNAL_SERVER_ERROR",
       });
     } else {
-      const referrals: Referral[] = data.persons;
-      const filteredReferrals = referrals.filter(
-        (ref) => ref.zoneId !== APS && (ref.referralStatusId === 20 || ref.referralStatusId === 10) && ref.personStatusId !== 40
-      );
-      res.status(200).send(filteredReferrals);
+      const referrals = await processReferralsWithAttempts(filterUncontactedReferrals(data.persons, areasData), String(refreshToken));
+      res.status(200).send(referrals);
     }
   }
 }
