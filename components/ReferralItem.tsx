@@ -4,6 +4,7 @@ import timestampToDate from "@/util/timestampToDate";
 import Offer from "./Offer";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import checkTimestampToday from "@/util/checkTimestampToday";
+import SpanItem from "./SpanItem";
 
 interface UnassignedReferralItemProps {
   referral: Referral;
@@ -34,25 +35,30 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
           )}
         </div>
 
-        <span className={styles.spanItem}>{timestampToDate(new Date(referral.createDate).getTime(), true)}</span>
-        <br />
-        {referral.contactInfo && (
-          <>
-            <span className={styles.spanItem}>{referral.contactInfo.phoneNumbers[0].number}</span>
-            <br />
-          </>
+        <SpanItem label={timestampToDate(new Date(referral.createDate).getTime(), true)} spanStyle={{ fontWeight: "bold" }} />
+
+        {referral.contactInfo && <SpanItem label={referral.contactInfo.phoneNumbers[0].number} spanStyle={{ fontWeight: "bold" }} />}
+
+        <SpanItem label={referral.address.toUpperCase()} spanStyle={{ fontWeight: "bold" }} />
+
+        {referral.contactAttempts && (
+          <SpanItem
+            label={`CONTACT ATTEMPTS (${referral.contactAttempts.length})`}
+            containerStyle={{ backgroundColor: "#1D3557" }}
+            spanStyle={{ fontWeight: "bold" }}
+          />
         )}
-        <span className={styles.spanItem}>{referral.address}</span>
-        <br />
-        {referral.contactAttempts && <span className={styles.spanItem}>Attempts: {referral.contactAttempts.length}</span>}
 
         {referral.areaInfo && referral.areaInfo.proselytingAreas && (
-          <>
-            <br />
-            <span className={styles.spanItem} style={{ fontWeight: "bold" }}>
-              Suggested Area: {referral.areaInfo.proselytingAreas[0].name}
-            </span>
-          </>
+          <SpanItem
+            label={`SUGGESTED AREA (${referral.areaInfo.proselytingAreas[0].name})`}
+            containerStyle={{ backgroundColor: "#1D3557" }}
+            spanStyle={{ fontWeight: "bold" }}
+          />
+        )}
+
+        {referral.contactAttempts && referral.contactAttempts.length > 0 && checkTimestampToday(referral.contactAttempts[0].itemDate) && (
+          <SpanItem label="LAST ATTEMPT TODAY" containerStyle={{ backgroundColor: "#E63946" }} spanStyle={{ fontWeight: "bold" }} />
         )}
         {referral.personOffer && referral.offerItem && openOfferReferral === referral.personGuid && <Offer referral={referral} />}
       </li>

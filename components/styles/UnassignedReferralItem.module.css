@@ -9,6 +9,19 @@
   text-decoration: inherit;
 }
 
+.spanLastAttempt {
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  font-family: Arial, Helvetica, sans-serif;
+  text-decoration: inherit;
+  color: white;
+  font-weight: bold;
+  font-size: small;
+  background-color: red;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+}
+
 .spanContainer {
   margin: 0;
   padding: 0;
@@ -25,7 +38,7 @@
 }
 
 .wrap {
-  display: flex;
+  display: inline-block;
   align-items: center;
 }
 

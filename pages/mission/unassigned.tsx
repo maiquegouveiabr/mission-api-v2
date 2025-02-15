@@ -274,24 +274,32 @@ export default function Unassigned({ referrals }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title containerStyles={{ color: "#1976d2" }} title={`Unassigned Referrals, (${filteredUnassigned.length})`} />
+          <Title containerStyles={{ color: "#1D3557" }} title={`UNASSIGNED REFERRALS (${filteredUnassigned.length})`} />
         </div>
-        <ButtonGroup variant="contained" aria-label="Basic button group">
-          {dataLoaded && <Button onClick={handleSetFilterUBA}>Uba</Button>}
+        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
-            <Button onClick={handleRooftop}>
+            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
+              Uba
+            </Button>
+          )}
+          {dataLoaded && (
+            <Button onClick={handleRooftop} style={{ backgroundColor: "#1D3557" }}>
               Rooftop
               <SwapVertIcon />
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleSetAttempts}>
+            <Button onClick={handleSetAttempts} style={{ backgroundColor: "#1D3557" }}>
               Attempts
               <SwapVertIcon />
             </Button>
           )}
-          {!dataLoaded && <Button onClick={handleLoadData}>Load</Button>}
-          <Button onClick={handleSetDate}>
+          {!dataLoaded && (
+            <Button onClick={handleLoadData} style={{ backgroundColor: "#1D3557" }}>
+              Load
+            </Button>
+          )}
+          <Button onClick={handleSetDate} style={{ backgroundColor: "#1D3557" }}>
             Date
             <SwapVertIcon />
           </Button>
@@ -306,29 +314,47 @@ export default function Unassigned({ referrals }: UnassignedProps) {
               dataLoaded={dataLoaded}
               openOfferReferral={openOfferReferral}
             />
-            <ButtonGroup variant="outlined" aria-label="Basic button group">
-              {dataLoaded && filteredUnassigned.contactInfo && (
-                <Button onClick={() => handleClick(filteredUnassigned)} variant="contained" style={{ minHeight: "40px" }}>
-                  <ContentCopyIcon />
-                </Button>
-              )}
-              {!filteredUnassigned.contactInfo && dataLoaded && (
-                <Button onClick={() => handleLoadReferralInfo(filteredUnassigned)} variant="contained" style={{ minHeight: "40px" }}>
-                  <PhoneIcon />
-                </Button>
-              )}
+            {dataLoaded && (
+              <ButtonGroup variant="outlined" aria-label="Basic button group">
+                {dataLoaded && filteredUnassigned.contactInfo && (
+                  <Button
+                    onClick={() => handleClick(filteredUnassigned)}
+                    variant="contained"
+                    style={{ minHeight: "40px", backgroundColor: "#457B9D" }}
+                  >
+                    <ContentCopyIcon />
+                  </Button>
+                )}
+                {!filteredUnassigned.contactInfo && dataLoaded && (
+                  <Button
+                    onClick={() => handleLoadReferralInfo(filteredUnassigned)}
+                    variant="contained"
+                    style={{ minHeight: "40px", backgroundColor: "#457B9D" }}
+                  >
+                    <PhoneIcon />
+                  </Button>
+                )}
 
-              {dataLoaded && (
-                <Button onClick={() => handleOfferItem(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
-                  Offer
-                </Button>
-              )}
-              {dataLoaded && filteredUnassigned.contactInfo && (
-                <Button onClick={() => handleOpenDialog(filteredUnassigned)} variant="outlined" style={{ minHeight: "40px" }}>
-                  <SendIcon />
-                </Button>
-              )}
-            </ButtonGroup>
+                {dataLoaded && (
+                  <Button
+                    onClick={() => handleOfferItem(filteredUnassigned)}
+                    variant="outlined"
+                    style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}
+                  >
+                    Offer
+                  </Button>
+                )}
+                {dataLoaded && filteredUnassigned.contactInfo && (
+                  <Button
+                    onClick={() => handleOpenDialog(filteredUnassigned)}
+                    variant="outlined"
+                    style={{ minHeight: "40px", borderColor: "#457B9D" }}
+                  >
+                    <SendIcon style={{ color: "#457B9D" }} />
+                  </Button>
+                )}
+              </ButtonGroup>
+            )}
           </div>
         ))}
       </UnassignedList>

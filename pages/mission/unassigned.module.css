@@ -8,8 +8,6 @@
 
 .title {
   font-weight: bold;
-  font-family: "Courier New", Courier, monospace;
-  color: #1976d2;
 }
 
 .container {
@@ -18,7 +16,6 @@
   background-position: center; /* Centers the image */
   background-repeat: no-repeat;
   background-attachment: fixed; /* Makes the background fixed while scrolling */
-
   background-color: #ccc;
   padding: 10px;
 }
