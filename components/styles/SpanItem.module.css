@@ -1,12 +1,11 @@
 .container {
   display: inline-block;
-  background-color: #5b5746;
-  padding: 0.3rem 0.5rem;
-  border-radius: 5px;
   margin-bottom: 0.25rem;
 }
 
 .spanItem {
-  color: white;
-  font-size: 13px;
+  color: #1d3557;
+  font-size: 16px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
 }

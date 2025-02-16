@@ -35,30 +35,24 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
           )}
         </div>
 
-        <SpanItem label={timestampToDate(new Date(referral.createDate).getTime(), true)} spanStyle={{ fontWeight: "bold" }} />
+        <SpanItem label={timestampToDate(new Date(referral.createDate).getTime(), true)} />
 
-        {referral.contactInfo && <SpanItem label={referral.contactInfo.phoneNumbers[0].number} spanStyle={{ fontWeight: "bold" }} />}
+        {referral.contactInfo && <SpanItem label={referral.contactInfo.phoneNumbers[0].number} />}
 
-        <SpanItem label={referral.address.toUpperCase()} spanStyle={{ fontWeight: "bold" }} />
+        <SpanItem label={referral.address} />
 
-        {referral.contactAttempts && (
-          <SpanItem
-            label={`CONTACT ATTEMPTS (${referral.contactAttempts.length})`}
-            containerStyle={{ backgroundColor: "#1D3557" }}
-            spanStyle={{ fontWeight: "bold" }}
-          />
-        )}
+        {referral.contactAttempts && <SpanItem label={`Contact Attempts (${referral.contactAttempts.length})`} />}
 
         {referral.areaInfo && referral.areaInfo.proselytingAreas && (
-          <SpanItem
-            label={`SUGGESTED AREA (${referral.areaInfo.proselytingAreas[0].name})`}
-            containerStyle={{ backgroundColor: "#1D3557" }}
-            spanStyle={{ fontWeight: "bold" }}
-          />
+          <SpanItem label={`Suggested Area (${referral.areaInfo.proselytingAreas[0].name})`} />
         )}
 
         {referral.contactAttempts && referral.contactAttempts.length > 0 && checkTimestampToday(referral.contactAttempts[0].itemDate) && (
-          <SpanItem label="LAST ATTEMPT TODAY" containerStyle={{ backgroundColor: "#E63946" }} spanStyle={{ fontWeight: "bold" }} />
+          <SpanItem
+            label="LAST ATTEMPT TODAY"
+            spanStyle={{ color: "white" }}
+            containerStyle={{ backgroundColor: "#E63946", padding: ".3rem", borderRadius: "5px" }}
+          />
         )}
         {referral.personOffer && referral.offerItem && openOfferReferral === referral.personGuid && <Offer referral={referral} />}
       </li>
