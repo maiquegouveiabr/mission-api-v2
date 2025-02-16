@@ -239,9 +239,9 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
       const response = await fetch(`${API_URL}/api/db/referralExist?id=${referral.personGuid}`);
       if (!response.ok) throw new Error(`${response.statusText}`);
-      const sent: boolean = await response.json();
-      if (sent) {
-        alert("This referral was sent by someone else.");
+      const { exist, who_sent } = await response.json();
+      if (exist) {
+        alert(`${who_sent} sent this referral already!`);
         return;
       }
       setCurrentReferral(referral);

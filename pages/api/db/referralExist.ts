@@ -17,9 +17,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
       if (referral) {
-        res.status(200).send(true);
+        res.status(200).json({
+          exist: true,
+          who_sent: referral.who_sent,
+        });
       } else {
-        res.status(200).send(false);
+        res.status(200).json({
+          exist: false,
+          who_sent: null,
+        });
       }
     }
   } catch (error) {
