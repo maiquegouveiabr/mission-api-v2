@@ -22,7 +22,15 @@ interface UnassignedProps {
   referrals: Referral[];
 }
 
+const titleOptions = [
+  { id: 0, title: "UNASSIGNED REFERRALS" },
+  { id: 1, title: "POSSIBLE UBA" },
+  { id: 2, title: "ROOFTOP" },
+  { id: 3, title: "3 DAYS+ W/O ATTEMPTS" },
+];
+
 export default function Unassigned({ referrals }: UnassignedProps) {
+  const [activeFilter, setActiveFilter] = useState(0);
   const [unassigned, setUnassigned] = useState(referrals);
   const [filteredUnassigned, setFilteredUnassigned] = useState(referrals);
   const [dateState, setDateState] = useState(true);
@@ -67,11 +75,13 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       }
     });
     setFilteredUnassigned(filtered);
+    setActiveFilter(1);
   };
 
   const handleSetDate = () => {
     const copyUnassigned = [...unassigned];
     setDateState(!dateState);
+    setActiveFilter(0);
     if (dateState) {
       const filtered = copyUnassigned.sort((a, b) => {
         if (a.createDate < b.createDate) {
@@ -100,6 +110,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   const handleSetAttempts = () => {
     const copyUnassigned = [...unassigned];
     setAttemptsState(!attemptsState);
+    setActiveFilter(0);
     if (attemptsState) {
       const filtered = copyUnassigned.sort((a, b) => {
         if (a.contactAttempts.length < b.contactAttempts.length) {
@@ -233,6 +244,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       if (ref.areaInfo.actualMatchAccuracy === "Rooftop" && ref.areaInfo.actualConfidence === "HIGH") return true;
     });
     setFilteredUnassigned(arr);
+    setActiveFilter(2);
   };
 
   const handleOpenDialog = async (referral: Referral) => {
@@ -257,6 +269,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     const copy = [...unassigned];
     const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
     setFilteredUnassigned(filteredCopy);
+    setActiveFilter(3);
   };
 
   return (
@@ -281,7 +294,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title containerStyles={{ color: "#1D3557" }} title={`UNASSIGNED REFERRALS (${filteredUnassigned.length})`} />
+          <Title containerStyles={{ color: "#1D3557" }} title={`${titleOptions[activeFilter].title} (${filteredUnassigned.length})`} />
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
