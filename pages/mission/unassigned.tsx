@@ -254,7 +254,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleWithoutAttempts3days = () => {
-    const copy = [...filteredUnassigned];
+    const copy = [...unassigned];
     const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
     setFilteredUnassigned(filteredCopy);
   };
