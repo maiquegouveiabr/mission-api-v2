@@ -24,4 +24,5 @@
   background-attachment: fixed; /* Makes the background fixed while scrolling */
   background-color: #ccc;
   padding: 10px;
+  min-height: 100%;
 }
