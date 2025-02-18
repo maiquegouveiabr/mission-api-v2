@@ -16,6 +16,7 @@ import icon from "@/img/naruto-icon.png";
 import "../../app/globals.css";
 import SimpleDialog from "@/components/SimpleDialog";
 import SendIcon from "@mui/icons-material/Send";
+import checkTimestamp3DaysOld from "@/util/checkTimestamp3DaysOld";
 
 interface UnassignedProps {
   referrals: Referral[];
@@ -252,6 +253,12 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     }
   };
 
+  const handleWithoutAttempts3days = () => {
+    const copy = [...filteredUnassigned];
+    const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
+    setFilteredUnassigned(filteredCopy);
+  };
+
   return (
     <div className={styles.container}>
       {currentReferral && (
@@ -278,17 +285,6 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
-            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
-              Uba
-            </Button>
-          )}
-          {dataLoaded && (
-            <Button onClick={handleRooftop} style={{ backgroundColor: "#1D3557" }}>
-              Rooftop
-              <SwapVertIcon />
-            </Button>
-          )}
-          {dataLoaded && (
             <Button onClick={handleSetAttempts} style={{ backgroundColor: "#1D3557" }}>
               Attempts
               <SwapVertIcon />
@@ -303,6 +299,21 @@ export default function Unassigned({ referrals }: UnassignedProps) {
             Date
             <SwapVertIcon />
           </Button>
+          {dataLoaded && (
+            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
+              Uba
+            </Button>
+          )}
+          {dataLoaded && (
+            <Button onClick={handleRooftop} style={{ backgroundColor: "#1D3557" }}>
+              Rooftop
+            </Button>
+          )}
+          {dataLoaded && (
+            <Button onClick={handleWithoutAttempts3days} style={{ backgroundColor: "#1D3557" }}>
+              3 Days+ w/o attempts
+            </Button>
+          )}
         </ButtonGroup>
       </div>
       <UnassignedList>
