@@ -18,8 +18,8 @@
 
 .container {
   background-image: url("../../img/stewie.png");
-  background-size: auto;
-  background-position: center;
+  background-size: cover;
+  background-position: center calc(50px);
   background-repeat: no-repeat;
   background-attachment: fixed;
   padding: 10px;
