@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 import { Cookie } from "puppeteer";
-import icon from "@/img/naruto-icon.png";
+import { WindowSettings } from "@/interfaces";
+import useEffectWindowTitle from "@/hooks/useEffectWindowTitle";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -49,19 +50,7 @@ const Login: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    document.title = "Shrek Plus - Referral Manager";
-    const link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-    if (link) {
-      link.href = icon.src;
-      link.className = styles.icon;
-    } else {
-      const newLink = document.createElement("link");
-      newLink.rel = "icon";
-      newLink.href = icon.src;
-      document.head.appendChild(newLink);
-    }
-  });
+  useEffectWindowTitle(WindowSettings.LOGIN_WINDOW);
 
   return (
     <div className={styles.container}>

@@ -1,85 +1,57 @@
-import { Area, Referral } from "@/interfaces";
+import { Referral, TitleOption, WindowSettings } from "@/interfaces";
 import UnassignedList from "@/components/UnassignedList";
 import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Title from "@/components/Title";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import timestampToDate from "@/util/timestampToDate";
-import { GetServerSideProps } from "next";
 import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
-import icon from "@/img/naruto-icon.png";
 import "../../app/globals.css";
 import SimpleDialog from "@/components/SimpleDialog";
 import SendIcon from "@mui/icons-material/Send";
 import checkTimestamp3DaysOld from "@/util/checkTimestamp3DaysOld";
+import checkTimestampToday from "@/util/checkTimestampToday";
+import useEffectWindowTitle from "@/hooks/useEffectWindowTitle";
+import { useAreas } from "@/hooks/useAreas";
+import useReferrals from "@/hooks/useReferrals";
+import LoadingPage from "@/components/LoadingPage";
+import { GetServerSideProps } from "next";
 
 interface UnassignedProps {
-  referrals: Referral[];
+  refreshToken: string;
 }
 
-const titleOptions = [
-  { id: 0, title: "UNASSIGNED REFERRALS" },
-  { id: 1, title: "POSSIBLE UBA" },
-  { id: 2, title: "ROOFTOP" },
-  { id: 3, title: "3 DAYS+ W/O ATTEMPTS" },
-];
-
-export default function Unassigned({ referrals }: UnassignedProps) {
+export default function Unassigned({ refreshToken }: UnassignedProps) {
   const [activeFilter, setActiveFilter] = useState(0);
-  const [unassigned, setUnassigned] = useState(referrals);
-  const [filteredUnassigned, setFilteredUnassigned] = useState(referrals);
   const [dateState, setDateState] = useState(true);
   const [attemptsState, setAttemptsState] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [openOfferReferral, setOpenOfferReferral] = useState("");
-  const [areas, setAreas] = useState<Area[] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
+  const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken));
+  const { areas, areasLoading } = useAreas();
 
-  useEffect(() => {
-    document.title = "Shrek Plus - Referral Manager";
-    const link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-    if (link) {
-      link.href = icon.src;
-      link.className = styles.icon;
-    } else {
-      const newLink = document.createElement("link");
-      newLink.rel = "icon";
-      newLink.href = icon.src;
-      document.head.appendChild(newLink);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAreas();
-  }, []);
-
-  const fetchAreas = async () => {
-    const isDev = process.env.NODE_ENV === "development";
-    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-    const response = await fetch(`${url}/api/db/areas`);
-    const data = await response.json();
-    setAreas(data);
-  };
+  useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
 
   const handleSetFilterUBA = () => {
-    const copyUnassigned = [...unassigned];
+    const copyUnassigned = [...referrals];
     const filtered = copyUnassigned.filter((ref) => {
       if (ref.areaInfo && ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) {
         return ref;
       }
     });
-    setFilteredUnassigned(filtered);
+    setFilteredReferrals(filtered);
     setActiveFilter(1);
   };
 
   const handleSetDate = () => {
-    const copyUnassigned = [...unassigned];
+    const copyUnassigned = [...referrals];
     setDateState(!dateState);
     setActiveFilter(0);
     if (dateState) {
@@ -92,7 +64,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         }
         return 0;
       });
-      setFilteredUnassigned(filtered);
+      setFilteredReferrals(filtered);
     } else {
       const filtered = copyUnassigned.sort((a, b) => {
         if (b.createDate < a.createDate) {
@@ -103,12 +75,12 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         }
         return 0;
       });
-      setFilteredUnassigned(filtered);
+      setFilteredReferrals(filtered);
     }
   };
 
   const handleSetAttempts = () => {
-    const copyUnassigned = [...unassigned];
+    const copyUnassigned = [...referrals];
     setAttemptsState(!attemptsState);
     setActiveFilter(0);
     if (attemptsState) {
@@ -121,7 +93,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         }
         return 0;
       });
-      setFilteredUnassigned(filtered);
+      setFilteredReferrals(filtered);
     } else {
       const filtered = copyUnassigned.sort((a, b) => {
         if (b.contactAttempts.length < a.contactAttempts.length) {
@@ -132,7 +104,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         }
         return 0;
       });
-      setFilteredUnassigned(filtered);
+      setFilteredReferrals(filtered);
     }
   };
 
@@ -173,8 +145,8 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       });
       const referralsWithAttempts = await attemptsResponse.json();
       setDataLoaded(true);
-      setUnassigned(referralsWithAttempts);
-      setFilteredUnassigned(referralsWithAttempts);
+      setReferrals(referralsWithAttempts);
+      setFilteredReferrals(referralsWithAttempts);
     }
   };
 
@@ -187,19 +159,19 @@ export default function Unassigned({ referrals }: UnassignedProps) {
       body: JSON.stringify(referral),
     });
     const data = await response.json();
-    const copyUnassigned = [...unassigned];
+    const copyUnassigned = [...referrals];
     const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
     if (index !== -1) {
       copyUnassigned[index] = data;
     }
-    const copyFiltered = [...filteredUnassigned];
+    const copyFiltered = [...filteredReferrals];
     const indexFiltered = copyFiltered.findIndex((ref) => ref.personGuid === referral.personGuid);
     if (indexFiltered !== -1) {
       copyFiltered[indexFiltered] = data;
     }
 
-    setFilteredUnassigned(copyFiltered);
-    setUnassigned(copyUnassigned);
+    setFilteredReferrals(copyFiltered);
+    setReferrals(copyUnassigned);
   };
 
   const handleOfferItem = async (referral: Referral) => {
@@ -212,8 +184,8 @@ export default function Unassigned({ referrals }: UnassignedProps) {
         body: JSON.stringify(referral),
       });
       const referralWithOffer: Referral | null = await response.json();
-      const copyUnassigned = [...unassigned];
-      const copyFiltered = [...filteredUnassigned];
+      const copyUnassigned = [...referrals];
+      const copyFiltered = [...filteredReferrals];
       if (referralWithOffer) {
         const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
         if (index !== -1) {
@@ -224,8 +196,8 @@ export default function Unassigned({ referrals }: UnassignedProps) {
           copyFiltered[indexFiltered] = referralWithOffer;
         }
       }
-      setFilteredUnassigned(copyFiltered);
-      setUnassigned(copyUnassigned);
+      setFilteredReferrals(copyFiltered);
+      setReferrals(copyUnassigned);
       setOpenOfferReferral(referral.personGuid);
     } else {
       if (openOfferReferral === referral.personGuid) {
@@ -236,14 +208,12 @@ export default function Unassigned({ referrals }: UnassignedProps) {
     }
   };
 
-  const handleRooftop = () => {
-    const filtered = [...unassigned];
-    const arr = filtered.filter((ref) => {
-      if (!ref.areaInfo) return false;
-      if (ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) return false;
-      if (ref.areaInfo.actualMatchAccuracy === "Rooftop" && ref.areaInfo.actualConfidence === "HIGH") return true;
-    });
-    setFilteredUnassigned(arr);
+  const handle2Attempts = () => {
+    const copyUnassigned = [...referrals];
+    const filteredCopy = copyUnassigned.filter(
+      (ref) => ref.contactAttempts && ref.contactAttempts.length === 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)
+    );
+    setFilteredReferrals(filteredCopy);
     setActiveFilter(2);
   };
 
@@ -266,13 +236,15 @@ export default function Unassigned({ referrals }: UnassignedProps) {
   };
 
   const handleWithoutAttempts3days = () => {
-    const copy = [...unassigned];
+    const copy = [...referrals];
     const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
-    setFilteredUnassigned(filteredCopy);
+    setFilteredReferrals(filteredCopy);
     setActiveFilter(3);
   };
 
-  return (
+  return loadingReferrals ? (
+    <LoadingPage />
+  ) : (
     <div className={styles.container}>
       {currentReferral && (
         <SimpleDialog
@@ -294,7 +266,10 @@ export default function Unassigned({ referrals }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title containerStyles={{ color: "#1D3557" }} title={`${titleOptions[activeFilter].title} (${filteredUnassigned.length})`} />
+          <Title
+            containerStyles={{ color: "#1D3557" }}
+            title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`}
+          />
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
@@ -314,23 +289,23 @@ export default function Unassigned({ referrals }: UnassignedProps) {
           </Button>
           {dataLoaded && (
             <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
-              Uba
+              {TitleOption.OPTION_2}
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleRooftop} style={{ backgroundColor: "#1D3557" }}>
-              Rooftop
+            <Button onClick={handle2Attempts} style={{ backgroundColor: "#1D3557" }}>
+              {TitleOption.OPTION_3}
             </Button>
           )}
           {dataLoaded && (
             <Button onClick={handleWithoutAttempts3days} style={{ backgroundColor: "#1D3557" }}>
-              3 Days+ w/o attempts
+              {TitleOption.OPTION_4}
             </Button>
           )}
         </ButtonGroup>
       </div>
       <UnassignedList>
-        {filteredUnassigned.map((filteredUnassigned) => (
+        {filteredReferrals.map((filteredUnassigned) => (
           <div key={filteredUnassigned.personGuid}>
             <ReferralItem
               key={filteredUnassigned.personGuid}
@@ -388,18 +363,7 @@ export default function Unassigned({ referrals }: UnassignedProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { refreshToken } = context.query;
-  const isDev = process.env.NODE_ENV === "development";
-  const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-  try {
-    const response = await fetch(`${url}/api/referrals/unassigned?refreshToken=${refreshToken}`);
-    const referrals = await response.json();
-    return {
-      props: { referrals },
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      props: { referrals: [] },
-    };
-  }
+  return {
+    props: { refreshToken },
+  };
 };

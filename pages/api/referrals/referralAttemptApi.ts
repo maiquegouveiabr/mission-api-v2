@@ -37,7 +37,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             contactAttempts: filteredAttempts,
           };
         }
-        return ref;
+        return {
+          ...ref,
+          contactAttempts: [],
+        };
       })
     );
     res.send(response);

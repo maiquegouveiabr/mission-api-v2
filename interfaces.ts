@@ -448,3 +448,15 @@ export interface Area {
   name: string;
   zone_id: number;
 }
+
+export enum TitleOption {
+  OPTION_1 = "UNASSIGNED REFERRALS",
+  OPTION_2 = "UBA",
+  OPTION_3 = "TWO ATTMP",
+  OPTION_4 = "THREE+ W/O ATTMP",
+}
+
+export enum WindowSettings {
+  LOGIN_WINDOW = "Family Guy - Log In",
+  UNASSIGNED_WINDOW = "Family Guy - Referral Manager",
+}

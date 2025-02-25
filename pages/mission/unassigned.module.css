@@ -17,11 +17,11 @@
 }
 
 .container {
-  /* background-image: url("../../img/unassigned.png");
-  background-size: cover; 
-  background-position: center; 
+  background-image: url("../../img/stewie.png");
+  background-size: auto;
+  background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;  */
+  background-attachment: fixed;
   padding: 10px;
   min-height: 100%;
 }
