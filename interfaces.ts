@@ -146,6 +146,7 @@ export interface Referral {
   phoneOtherTextable: boolean;
   phoneWorkTextable: boolean;
   phoneHomeTextable: boolean;
+  sentStatus?: boolean;
 }
 
 export interface ContactInfo {
@@ -175,110 +176,6 @@ export interface DataPrivacyData {
   privacyNoticeMethodId: number;
   privacyNoticeDueDate: string | null;
   affirmedInterestDate: number;
-}
-
-export interface ReferralComplete {
-  contactAttempts: ContactAttempt[];
-  areaInfo: AreaInfo;
-  person: {
-    id: string;
-    householdId: string;
-    ageCatId: number | null;
-    serverId: number;
-    status: number;
-    contactSource: number;
-    preferredLangId: number;
-    preferredContactType: string | null;
-    preferredPhoneType: string | null;
-    preferredEmailType: string | null;
-    cmisId: string | null;
-    prosAreaId: string | null;
-    firstName: string;
-    lastName: string | null;
-    gender: string | null;
-    memberPhotoPrivacyLevel: number;
-    modDate: string;
-    createDate: string;
-    note: string | null;
-    contactInfo: ContactInfo;
-    fellowshipInfo: string | null;
-    dropNotes: string | null;
-    commitments: string | null;
-    principleSummary: string | null;
-    cmisServicesMember: string | null;
-    membershipCreationDate: string | null;
-    lastStewardChangeDate: string | null;
-    deleted: boolean;
-    householdInfo: HouseholdInfo;
-    convert: boolean;
-    member: boolean;
-    dataPrivacyConsent: boolean;
-    pendingAnonymizationDate: number;
-    followerCmisIds: string[] | null;
-    tags: string[] | null;
-    dataPrivacyData: DataPrivacyData;
-    scheduledBaptism: string | null;
-    confirmationDate: string | null;
-    baptismDate: string | null;
-    memberHideProgressDate: string | null;
-    showOnDigitalProgressRecord: boolean;
-    doNotContactDate: string | null;
-    cmisMemberIsPrivate: boolean;
-    priesthoodConferred: boolean;
-    foundByPersonGuid: string | null;
-    suggestedArea: string | null;
-  };
-}
-
-export interface ReferralCompleteNoPerson {
-  contactAttempts: ContactAttempt[] | null;
-  areaInfo: AreaInfo | null;
-  id: string;
-  householdId: string;
-  ageCatId: number | null;
-  serverId: number;
-  status: number;
-  contactSource: number;
-  preferredLangId: number;
-  preferredContactType: string | null;
-  preferredPhoneType: string | null;
-  preferredEmailType: string | null;
-  cmisId: string | null;
-  prosAreaId: string | null;
-  firstName: string;
-  lastName: string | null;
-  gender: string | null;
-  memberPhotoPrivacyLevel: number;
-  modDate: string;
-  createDate: string;
-  note: string | null;
-  contactInfo: ContactInfo;
-  fellowshipInfo: string | null;
-  dropNotes: string | null;
-  commitments: string | null;
-  principleSummary: string | null;
-  cmisServicesMember: string | null;
-  membershipCreationDate: string | null;
-  lastStewardChangeDate: string | null;
-  deleted: boolean;
-  householdInfo: HouseholdInfo;
-  convert: boolean;
-  member: boolean;
-  dataPrivacyConsent: boolean;
-  pendingAnonymizationDate: number;
-  followerCmisIds: string[] | null;
-  tags: string[] | null;
-  dataPrivacyData: DataPrivacyData;
-  scheduledBaptism: string | null;
-  confirmationDate: string | null;
-  baptismDate: string | null;
-  memberHideProgressDate: string | null;
-  showOnDigitalProgressRecord: boolean;
-  doNotContactDate: string | null;
-  cmisMemberIsPrivate: boolean;
-  priesthoodConferred: boolean;
-  foundByPersonGuid: string | null;
-  suggestedArea: string | null;
 }
 
 export interface Mission {

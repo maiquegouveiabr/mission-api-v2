@@ -1,15 +1,37 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/util/db";
 
+interface ReferenceData {
+  id: string;
+  sent_date: Date;
+  name: string;
+  area_id: number;
+  other: string | null;
+  who_sent: string;
+  offer: string | null;
+  phone: string | null;
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const data = JSON.parse(req.body);
+  const data: ReferenceData = JSON.parse(req.body);
   if (!data) {
     res.status(400).json({
       at: "api/db/references",
-      message: "no data provided.",
+      message: "no data provided",
     });
   } else {
+    const existingReference = await prisma.reference.findUnique({
+      where: {
+        id: data.id,
+      },
+    });
+    if (existingReference) {
+      return res.status(409).json({
+        at: "api/db/references",
+        message: "reference already exists",
+      });
+    }
     const response = await prisma.reference.create({
       data,
     });

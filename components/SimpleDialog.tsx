@@ -13,6 +13,7 @@ interface SimpleDialogProps {
   onClose: () => void;
   data: Area[];
   referral: Referral;
+  postSent: (referral: Referral) => void;
 }
 
 const WHO_DATA = [
@@ -27,7 +28,7 @@ const WHO_DATA = [
   { id: 9, name: "Pilarzinho B" },
 ];
 
-export default function SimpleDialog({ onClose, data, open, referral }: SimpleDialogProps) {
+export default function SimpleDialog({ onClose, data, open, referral, postSent }: SimpleDialogProps) {
   const [areaId, setAreaId] = useState(1000);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
@@ -53,40 +54,53 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
   }, [referral.areaInfo]);
 
   const handleSend = async () => {
-    const name = referralName.trim();
-    const offerText = offer.trim();
-    const area = areaId;
-    const otherText = other.trim();
+    try {
+      const name = referralName.trim();
+      const offerText = offer.trim();
+      const area = areaId;
+      const otherText = other.trim();
 
-    if (!name || !offerText || sender === 0 || area === 1000) {
-      alert("Bruh, don't forget any fields!");
-      return;
-    } else {
-      if ((area === 1 || area === 0) && !otherText) {
+      if (!name || !offerText || sender === 0 || area === 1000) {
         alert("Bruh, don't forget any fields!");
         return;
+      } else {
+        if ((area === 1 || area === 0) && !otherText) {
+          alert("Bruh, don't forget any fields!");
+          return;
+        }
       }
+      const data = {
+        id: referral.personGuid,
+        name,
+        who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
+        other: otherText,
+        area_id: area,
+        offer: offerText,
+        phone: referral.contactInfo?.phoneNumbers[0].number,
+      };
+
+      setSending(true);
+      const isDev = process.env.NODE_ENV === "development";
+      const url = `${isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app"}`;
+      const response = await fetch(`${url}/api/db/references`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error("This referral was sent by someone else!");
+        } else {
+          throw new Error(response.statusText);
+        }
+      }
+      postSent(referral);
+      setSending(false);
+      handleClose();
+    } catch (error) {
+      alert(error);
+      setSending(false);
+      handleClose();
     }
-    const data = {
-      id: referral.personGuid,
-      name,
-      who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
-      other: otherText,
-      area_id: area,
-      offer: offerText,
-      phone: referral.contactInfo?.phoneNumbers[0].number,
-    };
-
-    setSending(true);
-    const isDev = process.env.NODE_ENV === "development";
-    const url = `${isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app"}`;
-    await fetch(`${url}/api/db/references`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-
-    setSending(false);
-    handleClose();
   };
 
   const handleClose = () => {
@@ -136,12 +150,7 @@ export default function SimpleDialog({ onClose, data, open, referral }: SimpleDi
             onChange={(event) => setOther(event.target.value)}
           />
         )}
-        <Button
-          disabled={sending}
-          onClick={handleSend}
-          variant="outlined"
-          style={{ backgroundColor: "#1976d2", color: "white", fontWeight: "bold" }}
-        >
+        <Button disabled={sending} onClick={handleSend} variant="outlined" style={{ backgroundColor: "#1976d2", color: "white", fontWeight: "bold" }}>
           Send
         </Button>
       </div>

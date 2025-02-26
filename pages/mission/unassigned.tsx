@@ -8,6 +8,7 @@ import { useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
+import DeleteIcon from "@mui/icons-material/Delete";
 import timestampToDate from "@/util/timestampToDate";
 import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -224,6 +225,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       if (!response.ok) throw new Error(`${response.statusText}`);
       const { exist, who_sent } = await response.json();
       if (exist) {
+        handlePostSentReferral(referral);
         alert(`${who_sent} sent this referral already!`);
         return;
       }
@@ -242,12 +244,36 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setActiveFilter(3);
   };
 
+  const handlePostSentReferral = (referral: Referral) => {
+    const copyReferrals = [...referrals];
+    const copyFiltered = [...filteredReferrals];
+
+    const index = copyReferrals.findIndex((ref) => ref.personGuid === referral.personGuid);
+
+    if (index !== -1) {
+      copyReferrals[index].sentStatus = true;
+      copyFiltered[index].sentStatus = true;
+    }
+
+    setReferrals(copyReferrals);
+    setFilteredReferrals(copyFiltered);
+  };
+
+  const handleDeleteFromList = (referral: Referral) => {
+    const copyReferrals = [...referrals];
+    const copyFiltered = [...filteredReferrals];
+
+    setReferrals(copyReferrals.filter((ref) => ref.personGuid !== referral.personGuid));
+    setFilteredReferrals(copyFiltered.filter((ref) => ref.personGuid !== referral.personGuid));
+  };
+
   return loadingReferrals ? (
     <LoadingPage />
   ) : (
     <div className={styles.container}>
       {currentReferral && (
         <SimpleDialog
+          postSent={handlePostSentReferral}
           data={areas ? areas : []}
           open={dialogOpen}
           onClose={() => {
@@ -266,10 +292,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title
-            containerStyles={{ color: "#1D3557" }}
-            title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`}
-          />
+          <Title containerStyles={{ color: "#1D3557" }} title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
@@ -305,51 +328,35 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         </ButtonGroup>
       </div>
       <UnassignedList>
-        {filteredReferrals.map((filteredUnassigned) => (
-          <div key={filteredUnassigned.personGuid}>
-            <ReferralItem
-              key={filteredUnassigned.personGuid}
-              referral={filteredUnassigned}
-              dataLoaded={dataLoaded}
-              openOfferReferral={openOfferReferral}
-            />
+        {filteredReferrals.map((ref) => (
+          <div key={ref.personGuid}>
+            <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
             {dataLoaded && (
               <ButtonGroup variant="outlined" aria-label="Basic button group">
-                {dataLoaded && filteredUnassigned.contactInfo && (
-                  <Button
-                    onClick={() => handleClick(filteredUnassigned)}
-                    variant="contained"
-                    style={{ minHeight: "40px", backgroundColor: "#457B9D" }}
-                  >
+                {dataLoaded && ref.contactInfo && (
+                  <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
                     <ContentCopyIcon />
                   </Button>
                 )}
-                {!filteredUnassigned.contactInfo && dataLoaded && (
-                  <Button
-                    onClick={() => handleLoadReferralInfo(filteredUnassigned)}
-                    variant="contained"
-                    style={{ minHeight: "40px", backgroundColor: "#457B9D" }}
-                  >
+                {!ref.contactInfo && dataLoaded && (
+                  <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
                     <PhoneIcon />
                   </Button>
                 )}
 
                 {dataLoaded && (
-                  <Button
-                    onClick={() => handleOfferItem(filteredUnassigned)}
-                    variant="outlined"
-                    style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}
-                  >
+                  <Button onClick={() => handleOfferItem(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}>
                     Offer
                   </Button>
                 )}
-                {dataLoaded && filteredUnassigned.contactInfo && (
-                  <Button
-                    onClick={() => handleOpenDialog(filteredUnassigned)}
-                    variant="outlined"
-                    style={{ minHeight: "40px", borderColor: "#457B9D" }}
-                  >
+                {dataLoaded && ref.contactInfo && !ref.sentStatus && (
+                  <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D" }}>
                     <SendIcon style={{ color: "#457B9D" }} />
+                  </Button>
+                )}
+                {dataLoaded && ref.sentStatus && (
+                  <Button onClick={() => handleDeleteFromList(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#e63946" }}>
+                    <DeleteIcon style={{ color: "white" }} />
                   </Button>
                 )}
               </ButtonGroup>
