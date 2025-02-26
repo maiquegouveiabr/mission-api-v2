@@ -147,6 +147,7 @@ export interface Referral {
   phoneWorkTextable: boolean;
   phoneHomeTextable: boolean;
   sentStatus?: boolean;
+  offerText?: string;
 }
 
 export interface ContactInfo {

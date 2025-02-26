@@ -112,11 +112,11 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const handleClick = async (ref: Referral) => {
     if (ref.areaInfo && ref.contactInfo) {
       try {
-        const text = `@${ref.areaInfo.proselytingAreas ? `${ref.areaInfo.proselytingAreas[0].name}` : "AREA_PLACEHOLDER"}\n${
-          ref.areaInfo.proselytingAreas ? `*${ref.areaInfo.proselytingAreas[0].name}*` : "*AREA_PLACEHOLDER*"
-        }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${
-          ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`
-        } - *OFERTA_PLACEHOLDER*\nNúmero: ${ref.contactInfo.phoneNumbers[0].number}\n*Cadastro em: ${timestampToDate(
+        const text = `@${ref.areaName ? ref.areaName : ref.areaInfo.proselytingAreas ? `${ref.areaInfo.proselytingAreas[0].name}` : "AREA_PLACEHOLDER"}\n${
+          ref.areaName ? `*${ref.areaName}*` : ref.areaInfo.proselytingAreas ? `*${ref.areaInfo.proselytingAreas[0].name}*` : "*AREA_PLACEHOLDER*"
+        }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`} - ${
+          ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`
+        }\nNúmero: ${ref.contactInfo.phoneNumbers[0].number}\n*Cadastro em: ${timestampToDate(
           new Date(ref.createDate).getTime(),
           true
         )}*\nAdicionamos uma tarefa como observação!`;
@@ -244,7 +244,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setActiveFilter(3);
   };
 
-  const handlePostSentReferral = (referral: Referral) => {
+  const handlePostSentReferral = (referral: Referral, offer?: string, areaId?: number) => {
     const copyReferrals = [...referrals];
     const copyFiltered = [...filteredReferrals];
 
@@ -253,8 +253,14 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     if (index !== -1) {
       copyReferrals[index].sentStatus = true;
       copyFiltered[index].sentStatus = true;
+      const updatedArea = areas?.find((area) => area.id === areaId);
+      if (offer && areaId && areas && updatedArea) {
+        copyReferrals[index].offerText = offer;
+        copyReferrals[index].areaName = updatedArea.name;
+        copyReferrals[index].areaId = updatedArea.id;
+        copyReferrals[index].zoneId = updatedArea.zone_id;
+      }
     }
-
     setReferrals(copyReferrals);
     setFilteredReferrals(copyFiltered);
   };

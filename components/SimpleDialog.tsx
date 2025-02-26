@@ -13,7 +13,7 @@ interface SimpleDialogProps {
   onClose: () => void;
   data: Area[];
   referral: Referral;
-  postSent: (referral: Referral) => void;
+  postSent: (referral: Referral, offer: string, areaId: number) => void;
 }
 
 const WHO_DATA = [
@@ -93,7 +93,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
           throw new Error(response.statusText);
         }
       }
-      postSent(referral);
+      postSent(referral, offerText.toUpperCase(), area);
       setSending(false);
       handleClose();
     } catch (error) {
