@@ -27,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       },
     });
     if (existingReference) {
-      return res.status(409).json({
+      res.status(409).json({
         at: "api/db/references",
         message: "reference already exists",
       });

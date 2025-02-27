@@ -41,138 +41,131 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
 
   const handleSetFilterUBA = () => {
-    const copyUnassigned = [...referrals];
-    const filtered = copyUnassigned.filter((ref) => {
-      if (ref.areaInfo && ref.areaInfo.organizations && ref.areaInfo.organizations[0].id === 31859) {
-        return ref;
-      }
-    });
+    const filtered = referrals.filter((ref) => ref.areaInfo?.organizations?.[0]?.id === 31859);
+
     setFilteredReferrals(filtered);
     setActiveFilter(1);
   };
 
   const handleSetDate = () => {
-    const copyUnassigned = [...referrals];
-    setDateState(!dateState);
+    setDateState((prev) => !prev);
     setActiveFilter(0);
-    if (dateState) {
-      const filtered = copyUnassigned.sort((a, b) => {
-        if (a.createDate < b.createDate) {
-          return -1;
-        }
-        if (a.createDate > b.createDate) {
-          return 1;
-        }
-        return 0;
-      });
-      setFilteredReferrals(filtered);
-    } else {
-      const filtered = copyUnassigned.sort((a, b) => {
-        if (b.createDate < a.createDate) {
-          return -1;
-        }
-        if (b.createDate > a.createDate) {
-          return 1;
-        }
-        return 0;
-      });
-      setFilteredReferrals(filtered);
-    }
+
+    // Create a new sorted array without mutating the original state
+    const sortedReferrals = [...referrals].sort((a, b) => (dateState ? a.createDate - b.createDate : b.createDate - a.createDate));
+
+    setFilteredReferrals(sortedReferrals);
   };
 
   const handleSetAttempts = () => {
-    const copyUnassigned = [...referrals];
-    setAttemptsState(!attemptsState);
+    setAttemptsState((prev) => !prev);
     setActiveFilter(0);
-    if (attemptsState) {
-      const filtered = copyUnassigned.sort((a, b) => {
-        if (a.contactAttempts.length < b.contactAttempts.length) {
-          return -1;
-        }
-        if (a.contactAttempts.length > b.contactAttempts.length) {
-          return 1;
-        }
-        return 0;
-      });
-      setFilteredReferrals(filtered);
-    } else {
-      const filtered = copyUnassigned.sort((a, b) => {
-        if (b.contactAttempts.length < a.contactAttempts.length) {
-          return -1;
-        }
-        if (b.contactAttempts.length > a.contactAttempts.length) {
-          return 1;
-        }
-        return 0;
-      });
-      setFilteredReferrals(filtered);
-    }
+
+    const sortedReferrals = [...referrals].sort((a, b) =>
+      attemptsState ? a.contactAttempts.length - b.contactAttempts.length : b.contactAttempts.length - a.contactAttempts.length
+    );
+
+    setFilteredReferrals(sortedReferrals);
   };
 
   const handleClick = async (ref: Referral) => {
-    if (ref.areaInfo && ref.contactInfo) {
-      try {
-        const text = `@${ref.areaName ? ref.areaName : ref.areaInfo.proselytingAreas ? `${ref.areaInfo.proselytingAreas[0].name}` : "AREA_PLACEHOLDER"}\n${
-          ref.areaName ? `*${ref.areaName}*` : ref.areaInfo.proselytingAreas ? `*${ref.areaInfo.proselytingAreas[0].name}*` : "*AREA_PLACEHOLDER*"
-        }\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`} - ${
-          ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`
-        }\nNúmero: ${ref.contactInfo.phoneNumbers[0].number}\n*Cadastro em: ${timestampToDate(
-          new Date(ref.createDate).getTime(),
-          true
-        )}*\nAdicionamos uma tarefa como observação!`;
-        await navigator.clipboard.writeText(text);
-      } catch (error) {
-        console.error(error);
-        alert("There was an error copying the text!");
-      }
+    if (!ref.areaInfo || !ref.contactInfo) return;
+
+    try {
+      const areaName = ref.areaName || ref.areaInfo.proselytingAreas?.[0]?.name || "AREA_PLACEHOLDER";
+
+      const phoneNumber = ref.contactInfo.phoneNumbers?.[0]?.number || "PHONE_PLACEHOLDER";
+
+      const text = `@${areaName}
+  *${areaName}*
+  Enviamos uma referência para vocês pelo Pregar Meu Evangelho!
+  ${ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`} - ${ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`}
+  Número: ${phoneNumber}
+  *Cadastro em: ${timestampToDate(new Date(ref.createDate).getTime(), true)}*
+  Adicionamos uma tarefa como observação!`;
+
+      await navigator.clipboard.writeText(text);
+    } catch (error) {
+      console.error(error);
+      alert("There was an error copying the text!");
     }
   };
 
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, delay = 2000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+      } catch (error) {
+        console.warn(`Attempt ${i + 1} failed: ${error}`);
+        if (i < retries - 1) await sleep(delay);
+      }
+    }
+    throw new Error("Max retries reached");
+  };
+
   const handleLoadData = async () => {
-    const isDev = process.env.NODE_ENV === "development";
-    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-    const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const areaResponse = await fetch(`${url}/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, {
-      method: "POST",
-      body: JSON.stringify(referrals),
-    });
-    if (!areaResponse.ok) {
-    } else {
-      const referralsCompleteWithArea = await areaResponse.json();
-      await sleep(3000);
-      const attemptsResponse = await fetch(`${url}/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
+    try {
+      const isDev = process.env.NODE_ENV === "development";
+      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
+      const refreshToken = localStorage.getItem("REFRESH_TOKEN");
+      if (!refreshToken) throw new Error("No refresh token found.");
+
+      const options = {
         method: "POST",
+
+        body: JSON.stringify(referrals),
+      };
+
+      // Fetch area info with retries
+      const referralsCompleteWithArea = await fetchWithRetry(`${url}/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, options);
+
+      // Fetch referral attempts with retries
+      const referralsWithAttempts = await fetchWithRetry(`${url}/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
+        ...options,
         body: JSON.stringify(referralsCompleteWithArea),
       });
-      const referralsWithAttempts = await attemptsResponse.json();
+
+      // Update state
       setDataLoaded(true);
       setReferrals(referralsWithAttempts);
       setFilteredReferrals(referralsWithAttempts);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      alert("Failed to load data. Please try again.");
     }
   };
 
   const handleLoadReferralInfo = async (referral: Referral) => {
-    const isDev = process.env.NODE_ENV === "development";
-    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-    const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-    const response = await fetch(`${url}/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
-      method: "POST",
-      body: JSON.stringify(referral),
-    });
-    const data = await response.json();
-    const copyUnassigned = [...referrals];
-    const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
-    if (index !== -1) {
-      copyUnassigned[index] = data;
-    }
-    const copyFiltered = [...filteredReferrals];
-    const indexFiltered = copyFiltered.findIndex((ref) => ref.personGuid === referral.personGuid);
-    if (indexFiltered !== -1) {
-      copyFiltered[indexFiltered] = data;
-    }
+    try {
+      const isDev = process.env.NODE_ENV === "development";
+      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
+      const refreshToken = localStorage.getItem("REFRESH_TOKEN");
 
-    setFilteredReferrals(copyFiltered);
-    setReferrals(copyUnassigned);
+      if (!refreshToken) throw new Error("No refresh token found.");
+
+      // Fetch referral info
+      const response = await fetch(`${url}/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+        method: "POST",
+
+        body: JSON.stringify(referral),
+      });
+
+      if (!response.ok) throw new Error(`Failed to fetch referral info: ${response.statusText}`);
+
+      const data = await response.json();
+
+      // Efficiently update state using map()
+      setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? data : ref)));
+
+      setFilteredReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? data : ref)));
+    } catch (error) {
+      console.error("Error loading referral info:", error);
+      alert("Failed to load referral info. Please try again.");
+    }
   };
 
   const handleOfferItem = async (referral: Referral) => {
@@ -233,7 +226,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       setDialogOpen(true);
     } catch (error) {
       console.error(error);
-      alert("INTERNAL_SERVER_ERROR");
+      alert(error);
     }
   };
 
@@ -245,24 +238,16 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   };
 
   const handlePostSentReferral = (referral: Referral, offer?: string, areaId?: number) => {
-    const copyReferrals = [...referrals];
-    const copyFiltered = [...filteredReferrals];
+    // Find the area once
+    const updatedAreaName = areas?.find((area) => area.id === areaId)?.name || "";
 
-    const index = copyReferrals.findIndex((ref) => ref.personGuid === referral.personGuid);
+    // Function to update a referral
+    const updateReferral = (item: Referral) =>
+      item.personGuid === referral.personGuid ? { ...item, sentStatus: true, offerText: offer, areaName: updatedAreaName } : item;
 
-    if (index !== -1) {
-      copyReferrals[index].sentStatus = true;
-      copyFiltered[index].sentStatus = true;
-      const updatedArea = areas?.find((area) => area.id === areaId);
-      if (offer && areaId && areas && updatedArea) {
-        copyReferrals[index].offerText = offer;
-        copyReferrals[index].areaName = updatedArea.name;
-        copyReferrals[index].areaId = updatedArea.id;
-        copyReferrals[index].zoneId = updatedArea.zone_id;
-      }
-    }
-    setReferrals(copyReferrals);
-    setFilteredReferrals(copyFiltered);
+    // Update state efficiently
+    setReferrals((prev) => prev.map(updateReferral));
+    setFilteredReferrals((prev) => prev.map(updateReferral));
   };
 
   const handleDeleteFromList = (referral: Referral) => {

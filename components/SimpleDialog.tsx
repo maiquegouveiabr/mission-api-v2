@@ -54,53 +54,49 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
   }, [referral.areaInfo]);
 
   const handleSend = async () => {
-    try {
-      const name = referralName.trim();
-      const offerText = offer.trim();
-      const area = areaId;
-      const otherText = other.trim();
+    const name = referralName.trim();
+    const offerText = offer.trim();
+    const area = areaId;
+    const otherText = other.trim();
 
-      if (!name || !offerText || sender === 0 || area === 1000) {
+    if (!name || !offerText || sender === 0 || area === 1000) {
+      alert("Bruh, don't forget any fields!");
+      return;
+    } else {
+      if ((area === 1 || area === 0) && !otherText) {
         alert("Bruh, don't forget any fields!");
         return;
-      } else {
-        if ((area === 1 || area === 0) && !otherText) {
-          alert("Bruh, don't forget any fields!");
-          return;
-        }
       }
-      const data = {
-        id: referral.personGuid,
-        name,
-        who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
-        other: otherText,
-        area_id: area,
-        offer: offerText,
-        phone: referral.contactInfo?.phoneNumbers[0].number,
-      };
-
-      setSending(true);
-      const isDev = process.env.NODE_ENV === "development";
-      const url = `${isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app"}`;
-      const response = await fetch(`${url}/api/db/references`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        if (response.status === 409) {
-          throw new Error("This referral was sent by someone else!");
-        } else {
-          throw new Error(response.statusText);
-        }
-      }
-      postSent(referral, offerText.toUpperCase(), area);
-      setSending(false);
-      handleClose();
-    } catch (error) {
-      alert(error);
-      setSending(false);
-      handleClose();
     }
+    const data = {
+      id: referral.personGuid,
+      name,
+      who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
+      other: otherText,
+      area_id: area,
+      offer: offerText,
+      phone: referral.contactInfo?.phoneNumbers[0].number,
+    };
+
+    setSending(true);
+    const isDev = process.env.NODE_ENV === "development";
+    const url = `${isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app"}`;
+    const response = await fetch(`${url}/api/db/references`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      if (response.status === 409) {
+        alert("This referral was sent by someone else!");
+        return;
+      } else if (response.status === 500) {
+        alert("INTERNAL_SERVER_ERROR");
+        return;
+      }
+    }
+    postSent(referral, offerText.toUpperCase(), area);
+    setSending(false);
+    handleClose();
   };
 
   const handleClose = () => {

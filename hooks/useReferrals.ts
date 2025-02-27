@@ -19,9 +19,23 @@ export default function useReferrals(refreshToken: string) {
         throw new Error("Failed to fetch areas");
       }
 
-      const data = await response.json();
-      setReferrals(data);
-      setFilteredReferrals(data);
+      const data: Referral[] = await response.json();
+      setReferrals(
+        data.map((ref) => {
+          return {
+            ...ref,
+            sentStatus: false,
+          };
+        })
+      );
+      setFilteredReferrals(
+        data.map((ref) => {
+          return {
+            ...ref,
+            sentStatus: false,
+          };
+        })
+      );
       setLoadingReferrals(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
