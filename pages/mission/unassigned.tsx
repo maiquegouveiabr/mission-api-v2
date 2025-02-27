@@ -76,13 +76,12 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
       const phoneNumber = ref.contactInfo.phoneNumbers?.[0]?.number || "PHONE_PLACEHOLDER";
 
-      const text = `@${areaName}
-  *${areaName}*
-  Enviamos uma referência para vocês pelo Pregar Meu Evangelho!
-  ${ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`} - ${ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`}
-  Número: ${phoneNumber}
-  *Cadastro em: ${timestampToDate(new Date(ref.createDate).getTime(), true)}*
-  Adicionamos uma tarefa como observação!`;
+      const text = `@${areaName}\n*${areaName}*\nEnviamos uma referência para vocês pelo Pregar Meu Evangelho!\n${
+        ref.lastName ? `*${ref.firstName} ${ref.lastName}*` : `*${ref.firstName}*`
+      } - ${ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`}\nNúmero: ${phoneNumber}\n*Cadastro em: ${timestampToDate(
+        new Date(ref.createDate).getTime(),
+        true
+      )}*\nAdicionamos uma tarefa como observação!`;
 
       await navigator.clipboard.writeText(text);
     } catch (error) {
