@@ -23,7 +23,7 @@ const WHO_DATA = [
   { id: 4, name: "Elder Bentes" },
   { id: 5, name: "Capão" },
   { id: 6, name: "Boa Vista" },
-  { id: 7, name: "Jd. das Américas" },
+  { id: 7, name: "Nova Esperança" },
   { id: 8, name: "Cachoeira 1" },
   { id: 9, name: "Pilarzinho B" },
 ];
