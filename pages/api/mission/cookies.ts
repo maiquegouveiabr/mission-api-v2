@@ -1,16 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { chromium } from "playwright-core";
 
-// Reuse browser connection for better performance
-let browser: any;
-
-async function getBrowser() {
-  if (!browser) {
-    browser = await chromium.connectOverCDP("wss://chrome.browserless.io?token=RgUZmLd0KF5gxG3b93d4771a20b2783b6d4ba1ed21");
-  }
-  return browser;
-}
-
 // API Route
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
@@ -23,7 +13,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const browser = await getBrowser();
+    const browser = await chromium.connectOverCDP("wss://chrome.browserless.io?token=RgUZmLd0KF5gxG3b93d4771a20b2783b6d4ba1ed21");
     const context = await browser.newContext();
     const page = await context.newPage();
 
@@ -43,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // ✅ Get cookies after successful login
     const cookies = await context.cookies();
 
-    await page.close(); // Free memory
+    browser.close(); // Free memory
 
     if (cookies.length > 0) {
       res.status(200).json(cookies);

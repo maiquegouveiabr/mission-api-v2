@@ -12,21 +12,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       message: "No data found",
     });
   } else {
-    const unassignedReferrals = referrals.filter(
-      (ref) => !ref.areaId && ref.personStatusId === 1
-    );
-    // const referralsComplete = await fetchReferralsInfo(
-    //   unassignedReferrals.map(
-    //     (ref) =>
-    //       `https://referralmanager.churchofjesuschrist.org/services/people/${ref.personGuid}`
-    //   ),
-    //   String(refreshToken)
-    // );
+    const unassignedReferrals = referrals.filter((ref) => !ref.areaId && ref.personStatusId === 1);
 
-    unassignedReferrals.sort(
-      (a, b) =>
-        new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
-    );
+    unassignedReferrals.sort((a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime());
 
     res.status(200).send(unassignedReferrals);
   }

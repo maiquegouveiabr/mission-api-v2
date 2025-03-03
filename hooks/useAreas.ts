@@ -1,7 +1,8 @@
 import { Area } from "@/interfaces";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState, useEffect } from "react";
 
-export function useAreas() {
+export function useAreas(router: AppRouterInstance) {
   const [areas, setAreas] = useState<Area[] | null>(null);
   const [areasLoading, setAreasLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +16,7 @@ export function useAreas() {
       const response = await fetch(`${url}/api/db/areas`);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch areas");
+        throw new Error("Failed to fetch areas from database");
       }
 
       const data = await response.json();
@@ -30,6 +31,13 @@ export function useAreas() {
   useEffect(() => {
     fetchAreas();
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      router.refresh();
+    }
+  }, [error]);
 
   return { areas, areasLoading, error, fetchAreas };
 }

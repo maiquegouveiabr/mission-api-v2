@@ -1,7 +1,8 @@
 import { Referral } from "@/interfaces";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState, useEffect } from "react";
 
-export default function useReferrals(refreshToken: string) {
+export default function useReferrals(refreshToken: string, router: AppRouterInstance) {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [filteredReferrals, setFilteredReferrals] = useState<Referral[]>([]);
   const [loadingReferrals, setLoadingReferrals] = useState<boolean>(true);
@@ -16,7 +17,7 @@ export default function useReferrals(refreshToken: string) {
       const response = await fetch(`${url}/api/referrals/unassigned?refreshToken=${refreshToken}`);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch areas");
+        throw new Error("Failed to fetch referrals");
       }
 
       const data: Referral[] = await response.json();
@@ -45,6 +46,13 @@ export default function useReferrals(refreshToken: string) {
   useEffect(() => {
     fetchReferrals();
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      router.replace("/");
+    }
+  }, [error]);
 
   return { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals, error, fetchReferrals };
 }

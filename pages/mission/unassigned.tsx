@@ -10,7 +10,6 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import timestampToDate from "@/util/timestampToDate";
-import sleep from "@/util/sleep";
 import PhoneIcon from "@mui/icons-material/Phone";
 import "../../app/globals.css";
 import SimpleDialog from "@/components/SimpleDialog";
@@ -22,12 +21,14 @@ import { useAreas } from "@/hooks/useAreas";
 import useReferrals from "@/hooks/useReferrals";
 import LoadingPage from "@/components/LoadingPage";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/navigation";
 
 interface UnassignedProps {
   refreshToken: string;
 }
 
 export default function Unassigned({ refreshToken }: UnassignedProps) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState(0);
   const [dateState, setDateState] = useState(true);
   const [attemptsState, setAttemptsState] = useState(false);
@@ -35,8 +36,8 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const [openOfferReferral, setOpenOfferReferral] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
-  const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken));
-  const { areas, areasLoading } = useAreas();
+  const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken), router);
+  const { areas, areasLoading } = useAreas(router);
 
   useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
 
@@ -360,6 +361,14 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { refreshToken } = context.query;
+  if (!refreshToken) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
   return {
     props: { refreshToken },
   };

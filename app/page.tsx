@@ -42,7 +42,7 @@ const Login: React.FC = () => {
         const REFRESH_TOKEN = cookies.find((cookie) => cookie.name === "oauth-abw_refresh_token");
         if (REFRESH_TOKEN) {
           localStorage.setItem("REFRESH_TOKEN", REFRESH_TOKEN.value);
-          router.push(`/mission/unassigned?refreshToken=${REFRESH_TOKEN?.value}`);
+          router.replace(`/mission/unassigned?refreshToken=${REFRESH_TOKEN?.value}`);
         }
       }
     } catch (error) {
@@ -58,24 +58,12 @@ const Login: React.FC = () => {
       <div className={styles.labelContainer}>
         <label className={styles.label}>Username</label>
       </div>
-      <input
-        type="text"
-        className={styles.input}
-        placeholder="Enter Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+      <input type="text" className={styles.input} placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} />
 
       <div className={styles.labelContainer}>
         <label className={styles.label}>Password</label>
       </div>
-      <input
-        type="password"
-        className={styles.input}
-        placeholder="Enter Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      <input type="password" className={styles.input} placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
       <button disabled={isLoading} className={styles.loginButton} onClick={handleLogin}>
         Login
