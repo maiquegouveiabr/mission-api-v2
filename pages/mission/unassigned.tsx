@@ -22,6 +22,8 @@ import useReferrals from "@/hooks/useReferrals";
 import LoadingPage from "@/components/LoadingPage";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/navigation";
+import filterReferralsFromToday from "@/util/filterReferralsFromToday";
+import filterReferralsFromYesterday from "@/util/filterReferralsFromYesterday";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -54,17 +56,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
     // Create a new sorted array without mutating the original state
     const sortedReferrals = [...referrals].sort((a, b) => (dateState ? a.createDate - b.createDate : b.createDate - a.createDate));
-
-    setFilteredReferrals(sortedReferrals);
-  };
-
-  const handleSetAttempts = () => {
-    setAttemptsState((prev) => !prev);
-    setActiveFilter(0);
-
-    const sortedReferrals = [...referrals].sort((a, b) =>
-      attemptsState ? a.contactAttempts.length - b.contactAttempts.length : b.contactAttempts.length - a.contactAttempts.length
-    );
 
     setFilteredReferrals(sortedReferrals);
   };
@@ -258,6 +249,18 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setFilteredReferrals(copyFiltered.filter((ref) => ref.personGuid !== referral.personGuid));
   };
 
+  const handleFilterReferralsFromToday = () => {
+    const filtered = filterReferralsFromToday(referrals);
+    setFilteredReferrals(filtered);
+    setActiveFilter(4);
+  };
+
+  const handleFilterReferralsFromYesterday = () => {
+    const filtered = filterReferralsFromYesterday(referrals);
+    setFilteredReferrals(filtered);
+    setActiveFilter(5);
+  };
+
   return loadingReferrals ? (
     <LoadingPage />
   ) : (
@@ -287,23 +290,18 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         </div>
         <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
           {dataLoaded && (
-            <Button onClick={handleSetAttempts} style={{ backgroundColor: "#1D3557" }}>
-              Attempts
-              <SwapVertIcon />
-            </Button>
-          )}
-          {!dataLoaded && (
-            <Button onClick={handleLoadData} style={{ backgroundColor: "#1D3557" }}>
-              Load
-            </Button>
-          )}
-          <Button onClick={handleSetDate} style={{ backgroundColor: "#1D3557" }}>
-            Date
-            <SwapVertIcon />
-          </Button>
-          {dataLoaded && (
             <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
               {TitleOption.OPTION_2}
+            </Button>
+          )}
+          {dataLoaded && (
+            <Button onClick={handleFilterReferralsFromToday} style={{ backgroundColor: "#1D3557" }}>
+              Today's
+            </Button>
+          )}
+          {dataLoaded && (
+            <Button onClick={handleFilterReferralsFromYesterday} style={{ backgroundColor: "#1D3557" }}>
+              Yesterday's
             </Button>
           )}
           {dataLoaded && (
@@ -316,6 +314,14 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
               {TitleOption.OPTION_4}
             </Button>
           )}
+          {!dataLoaded && (
+            <Button onClick={handleLoadData} style={{ backgroundColor: "#1D3557" }}>
+              Load
+            </Button>
+          )}
+          <Button onClick={handleSetDate} style={{ backgroundColor: "#1D3557" }}>
+            <SwapVertIcon />
+          </Button>
         </ButtonGroup>
       </div>
       <UnassignedList>
