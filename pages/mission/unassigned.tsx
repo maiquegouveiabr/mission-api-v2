@@ -73,7 +73,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       } - ${ref.offerText ? `*${ref.offerText}*` : `*OFERTA_PLACEHOLDER*`}\nNúmero: ${phoneNumber}\n*Cadastro em: ${timestampToDate(
         new Date(ref.createDate).getTime(),
         true
-      )}`;
+      )}*`;
 
       await navigator.clipboard.writeText(text);
     } catch (error) {
