@@ -7,8 +7,8 @@ export default (timestamp: number, timeIncluded: boolean) => {
   if (timeIncluded) {
     const minutes = `${date.getMinutes()}`.padStart(2, "0");
     const hour = `${date.getHours()}`.padStart(2, "0");
-    return `${month}/${day}/${year} ${hour}:${minutes}`;
+    return `${day}/${month}/${year} ${hour}:${minutes}`;
   } else {
-    return `${month}/${day}/${year}`;
+    return `${day}/${month}/${year}`;
   }
 };
