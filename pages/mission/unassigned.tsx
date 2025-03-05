@@ -241,12 +241,9 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setFilteredReferrals((prev) => prev.map(updateReferral));
   };
 
-  const handleDeleteFromList = (referral: Referral) => {
-    const copyReferrals = [...referrals];
-    const copyFiltered = [...filteredReferrals];
-
-    setReferrals(copyReferrals.filter((ref) => ref.personGuid !== referral.personGuid));
-    setFilteredReferrals(copyFiltered.filter((ref) => ref.personGuid !== referral.personGuid));
+  const handleDeleteReferral = (referral: Referral) => {
+    setReferrals(referrals.filter((ref) => ref.personGuid !== referral.personGuid));
+    setFilteredReferrals(filteredReferrals.filter((ref) => ref.personGuid !== referral.personGuid));
   };
 
   const handleFilterReferralsFromToday = () => {
@@ -328,36 +325,33 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         {filteredReferrals.map((ref) => (
           <div key={ref.personGuid}>
             <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
-            {dataLoaded && (
-              <ButtonGroup variant="outlined" aria-label="Basic button group">
-                {dataLoaded && ref.contactInfo && (
-                  <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
-                    <ContentCopyIcon />
-                  </Button>
-                )}
-                {!ref.contactInfo && dataLoaded && (
-                  <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
-                    <PhoneIcon />
-                  </Button>
-                )}
 
-                {dataLoaded && (
-                  <Button onClick={() => handleOfferItem(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}>
-                    Offer
-                  </Button>
-                )}
-                {dataLoaded && ref.contactInfo && !ref.sentStatus && (
-                  <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D" }}>
-                    <SendIcon style={{ color: "#457B9D" }} />
-                  </Button>
-                )}
-                {dataLoaded && ref.sentStatus && (
-                  <Button onClick={() => handleDeleteFromList(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#e63946" }}>
-                    <DeleteIcon style={{ color: "white" }} />
-                  </Button>
-                )}
-              </ButtonGroup>
-            )}
+            <ButtonGroup variant="outlined" aria-label="Basic button group">
+              <Button onClick={() => handleDeleteReferral(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#e63946" }}>
+                <DeleteIcon style={{ color: "white" }} />
+              </Button>
+              {dataLoaded && ref.contactInfo && (
+                <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
+                  <ContentCopyIcon />
+                </Button>
+              )}
+              {!ref.contactInfo && dataLoaded && (
+                <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
+                  <PhoneIcon />
+                </Button>
+              )}
+
+              {dataLoaded && (
+                <Button onClick={() => handleOfferItem(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}>
+                  Offer
+                </Button>
+              )}
+              {dataLoaded && ref.contactInfo && !ref.sentStatus && (
+                <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D" }}>
+                  <SendIcon style={{ color: "#457B9D" }} />
+                </Button>
+              )}
+            </ButtonGroup>
           </div>
         ))}
       </UnassignedList>
