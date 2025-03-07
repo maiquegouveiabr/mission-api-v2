@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+  background-color: var(--background); /* Equivalent to bg-gray-100 */
 }
 
 .inner {
@@ -16,7 +16,7 @@
 .spinner {
   width: 3rem; /* 12px * 4 = 48px */
   height: 3rem;
-  border: 10px solid #3b82f6; /* Equivalent to border-blue-500 */
+  border: 10px solid var(--font-color); /* Equivalent to border-blue-500 */
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -26,7 +26,7 @@
   margin-top: 1rem;
   font-size: 1.3rem; /* Equivalent to text-lg */
   font-weight: bold; /* Equivalent to font-semibold */
-  color: #374151; /* Equivalent to text-gray-700 */
+  color: var(--font-color); /* Equivalent to text-gray-700 */
 }
 
 @keyframes spin {

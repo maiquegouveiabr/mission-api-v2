@@ -284,40 +284,46 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
             alignItems: "flex-start",
           }}
         >
-          <Title containerStyles={{ color: "#1D3557" }} title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
+          <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
         </div>
-        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "10px", color: "white" }}>
+        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "5px", backgroundColor: "#2f4858" }}>
           {dataLoaded && (
-            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#1D3557" }}>
+            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
               {TitleOption.OPTION_2}
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleFilterReferralsFromToday} style={{ backgroundColor: "#1D3557" }}>
+            <Button
+              onClick={handleFilterReferralsFromToday}
+              style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}
+            >
               Today's
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleFilterReferralsFromYesterday} style={{ backgroundColor: "#1D3557" }}>
+            <Button
+              onClick={handleFilterReferralsFromYesterday}
+              style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}
+            >
               Yesterday's
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleTwoPlusEvents} style={{ backgroundColor: "#1D3557" }}>
+            <Button onClick={handleTwoPlusEvents} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
               {TitleOption.OPTION_3}
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleWithoutAttempts3days} style={{ backgroundColor: "#1D3557" }}>
+            <Button onClick={handleWithoutAttempts3days} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
               {TitleOption.OPTION_4}
             </Button>
           )}
           {!dataLoaded && (
-            <Button onClick={handleLoadData} style={{ backgroundColor: "#1D3557" }}>
+            <Button onClick={handleLoadData} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
               Load
             </Button>
           )}
-          <Button onClick={handleSetDate} style={{ backgroundColor: "#1D3557" }}>
+          <Button onClick={handleSetDate} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
             <SwapVertIcon />
           </Button>
         </ButtonGroup>
@@ -328,28 +334,40 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
             <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
 
             <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button onClick={() => handleDeleteReferral(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#e63946" }}>
+              <Button
+                onClick={() => handleDeleteReferral(ref)}
+                variant="contained"
+                style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
+              >
                 <DeleteIcon style={{ color: "white" }} />
               </Button>
               {dataLoaded && ref.contactInfo && (
-                <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
+                <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#5aaa95", fontFamily: "Verdana" }}>
                   <ContentCopyIcon />
                 </Button>
               )}
               {!ref.contactInfo && dataLoaded && (
-                <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#457B9D" }}>
+                <Button
+                  onClick={() => handleLoadReferralInfo(ref)}
+                  variant="contained"
+                  style={{ minHeight: "40px", backgroundColor: "#5aaa95", fontFamily: "Verdana" }}
+                >
                   <PhoneIcon />
                 </Button>
               )}
 
               {dataLoaded && (
-                <Button onClick={() => handleOfferItem(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D", color: "#457B9D" }}>
+                <Button
+                  onClick={() => handleOfferItem(ref)}
+                  variant="outlined"
+                  style={{ minHeight: "40px", borderColor: "#5aaa95", color: "#5aaa95", fontFamily: "Verdana" }}
+                >
                   Offer
                 </Button>
               )}
               {dataLoaded && ref.contactInfo && !ref.sentStatus && (
-                <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#457B9D" }}>
-                  <SendIcon style={{ color: "#457B9D" }} />
+                <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#5aaa95", fontFamily: "Verdana" }}>
+                  <SendIcon style={{ color: "#5aaa95" }} />
                 </Button>
               )}
             </ButtonGroup>

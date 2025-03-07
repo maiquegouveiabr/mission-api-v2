@@ -1,5 +1,5 @@
 .mainContainer {
-  background-color: #1d3557;
+  background-color: #5aaa95;
   max-width: 60%;
   width: fit-content;
   padding: 0.7rem;
@@ -7,13 +7,14 @@
 }
 
 .mainContainer p {
-  color: white;
   margin: 0;
+  color: white;
 }
 
 .title {
   font-weight: bold;
   padding-bottom: 10px;
+  color: var(--background);
 }
 
 .container {
@@ -43,9 +44,14 @@
 }
 
 .itemContainer {
-  background-color: #1d3557;
+  background-color: var(--background);
   padding: 0.5rem;
   flex: 0 0 auto; /* Ensures items don't shrink */
   min-width: fit-content;
   border-radius: 5px;
+}
+
+.pItem {
+  color: "white";
+  font-weight: bold;
 }

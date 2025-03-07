@@ -1,18 +1,22 @@
 :root {
-  --background: #ffffff;
+  --background: #faf0ca;
   --foreground: #171717;
+  --header: #5aaa95;
+  --header-font: #2f4858;
+  --font-color: #2f4858;
+  --btn-background: #9197ae;
+  --font-warning: #f45d01;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background-color: #ccc;
+  background-color: var(--background);
 }
 
 body {
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  color: var(--foreground);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

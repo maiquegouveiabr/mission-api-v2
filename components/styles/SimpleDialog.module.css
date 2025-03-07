@@ -16,5 +16,5 @@
 }
 
 .title {
-  color: #1976d2;
+  color: var(--header-font);
 }

@@ -112,7 +112,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
     <Dialog open={open} key={referral.personGuid}>
       <div className={styles.titleContainer}>
         <h2 className={styles.title}>Save Referral</h2>
-        <DisabledByDefaultOutlinedIcon onClick={handleClose} cursor="pointer" fontSize="large" color="warning" />
+        <DisabledByDefaultOutlinedIcon onClick={handleClose} cursor="pointer" fontSize="large" style={{ color: "#e63946" }} />
       </div>
       <div className={styles.contentContainer}>
         <TextField
@@ -146,7 +146,12 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
             onChange={(event) => setOther(event.target.value)}
           />
         )}
-        <Button disabled={sending} onClick={handleSend} variant="outlined" style={{ backgroundColor: "#1976d2", color: "white", fontWeight: "bold" }}>
+        <Button
+          disabled={sending}
+          onClick={handleSend}
+          variant="outlined"
+          style={{ backgroundColor: "#f45d01", color: "white", fontWeight: "bold", border: "none" }}
+        >
           Send
         </Button>
       </div>
