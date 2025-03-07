@@ -194,10 +194,10 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     }
   };
 
-  const handle2Attempts = () => {
+  const handleTwoPlusEvents = () => {
     const copyUnassigned = [...referrals];
     const filteredCopy = copyUnassigned.filter(
-      (ref) => ref.contactAttempts && ref.contactAttempts.length === 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)
+      (ref) => ref.contactAttempts && ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)
     );
     setFilteredReferrals(filteredCopy);
     setActiveFilter(2);
@@ -303,7 +303,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handle2Attempts} style={{ backgroundColor: "#1D3557" }}>
+            <Button onClick={handleTwoPlusEvents} style={{ backgroundColor: "#1D3557" }}>
               {TitleOption.OPTION_3}
             </Button>
           )}
