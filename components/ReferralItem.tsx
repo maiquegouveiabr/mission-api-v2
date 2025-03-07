@@ -6,6 +6,8 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import checkTimestampToday from "@/util/checkTimestampToday";
 import SpanItem from "./SpanItem";
 
+import EventDropdown from "./EventDropdown";
+
 interface UnassignedReferralItemProps {
   referral: Referral;
   dataLoaded: boolean;
@@ -17,18 +19,12 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
     <div className={styles.container}>
       <li>
         <div className={styles.wrap}>
-          <a
-            className={styles.linkItem}
-            target="_blank"
-            href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}
-          >
+          <a className={styles.linkItem} target="_blank" href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}>
             <p className={styles.spanItem}>
               {referral.firstName} {referral.lastName ? referral.lastName : ""}
             </p>
           </a>
-          {referral.contactAttempts &&
-          referral.contactAttempts.length >= 2 &&
-          !checkTimestampToday(referral.contactAttempts[0].itemDate) ? (
+          {referral.contactAttempts && referral.contactAttempts.length >= 2 && !checkTimestampToday(referral.contactAttempts[0].itemDate) ? (
             <ErrorOutlineIcon color="warning" />
           ) : (
             referral.contactAttempts && referral.contactAttempts.length >= 3 && <ErrorOutlineIcon color="warning" />
@@ -41,20 +37,9 @@ const UnassignedReferralItem = ({ referral, openOfferReferral }: UnassignedRefer
 
         <SpanItem label={referral.address} />
 
-        {referral.contactAttempts && <SpanItem label={`Contact Attempts (${referral.contactAttempts.length})`} />}
-
-        {referral.areaInfo && referral.areaInfo.proselytingAreas && (
-          <SpanItem label={`Suggested Area (${referral.areaInfo.proselytingAreas[0].name})`} />
-        )}
-
-        {referral.contactAttempts && referral.contactAttempts.length > 0 && checkTimestampToday(referral.contactAttempts[0].itemDate) && (
-          <SpanItem
-            label="LAST ATTEMPT TODAY"
-            spanStyle={{ color: "white" }}
-            containerStyle={{ backgroundColor: "#E63946", padding: ".3rem", borderRadius: "5px" }}
-          />
-        )}
+        {referral.areaInfo && referral.areaInfo.proselytingAreas && <SpanItem label={`Suggested Area (${referral.areaInfo.proselytingAreas[0].name})`} />}
         {referral.personOffer && referral.offerItem && openOfferReferral === referral.personGuid && <Offer referral={referral} />}
+        {referral.contactAttempts && referral.contactAttempts.length > 0 && <EventDropdown events={referral.contactAttempts} />}
       </li>
     </div>
   );
