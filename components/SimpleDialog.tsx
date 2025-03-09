@@ -17,6 +17,7 @@ interface SimpleDialogProps {
 }
 
 const WHO_DATA = [
+  { id: 9, name: "Pilarzinho B" },
   { id: 1, name: "Pilarzinho R" },
   { id: 2, name: "Pilarzinho H" },
   { id: 3, name: "Elder Gouveia" },
@@ -25,7 +26,6 @@ const WHO_DATA = [
   { id: 6, name: "Boa Vista" },
   { id: 7, name: "Nova Esperança" },
   { id: 8, name: "Cachoeira 1" },
-  { id: 9, name: "Pilarzinho B" },
 ];
 
 export default function SimpleDialog({ onClose, data, open, referral, postSent }: SimpleDialogProps) {
