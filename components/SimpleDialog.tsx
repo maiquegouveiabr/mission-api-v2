@@ -135,12 +135,12 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
         />
         <Selector onChange={handleSelectorChangeWho} currentValue={sender} inputLabel="Who" data={WHO_DATA} />
         <Selector onChange={handleSelectorChange} currentValue={areaId} inputLabel="Area" data={data} />
-        {(areaId === 0 || areaId === 1) && (
+        {(areaId === 0 || areaId === 1 || areaId === 2) && (
           <TextField
             required
             autoComplete="false"
             id="outlined-basic"
-            label={`${areaId === 0 ? "UBA Area" : "Mission Name"}`}
+            label={`${(areaId === 0 && "UBA Area") || (areaId === 1 && "Mission Name") || (areaId === 2 && "Reason To Stop Teaching")}`}
             variant="outlined"
             value={other}
             onChange={(event) => setOther(event.target.value)}
