@@ -63,7 +63,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
       alert("Bruh, don't forget any fields!");
       return;
     } else {
-      if ((area === 1 || area === 0) && !otherText) {
+      if ((area === 1 || area === 0 || area === 2) && !otherText) {
         alert("Bruh, don't forget any fields!");
         return;
       }
