@@ -196,9 +196,16 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
   const handleTwoPlusEvents = () => {
     const copyUnassigned = [...referrals];
-    const filteredCopy = copyUnassigned.filter(
-      (ref) => ref.contactAttempts && ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)
-    );
+    const filteredCopy = copyUnassigned.filter((ref) => {
+      if (ref.contactAttempts) {
+        if (ref.contactAttempts.length >= 4) {
+          return true;
+        }
+        if (ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
+      }
+      return false;
+    });
+
     setFilteredReferrals(filteredCopy);
     setActiveFilter(2);
   };
