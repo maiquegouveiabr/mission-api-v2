@@ -410,8 +410,8 @@ export enum TitleOption {
 }
 
 export enum WindowSettings {
-  LOGIN_WINDOW = "Family Guy - Log In",
-  UNASSIGNED_WINDOW = "Family Guy - Referral Manager",
+  LOGIN_WINDOW = "Toy Story - Log In",
+  UNASSIGNED_WINDOW = "Toy Story - Referral Manager",
 }
 
 enum ZoneEnum {

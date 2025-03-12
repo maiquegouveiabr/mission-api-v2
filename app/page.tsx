@@ -57,16 +57,16 @@ const Login: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.labelContainer}>
         <label className={styles.label}>Username</label>
+        <input type="text" className={styles.input} placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} />
       </div>
-      <input type="text" className={styles.input} placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} />
 
       <div className={styles.labelContainer}>
+        <input type="password" className={styles.input} placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <label className={styles.label}>Password</label>
       </div>
-      <input type="password" className={styles.input} placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
       <button disabled={isLoading} className={styles.loginButton} onClick={handleLogin}>
-        Login
+        Jump In
       </button>
     </div>
   );
