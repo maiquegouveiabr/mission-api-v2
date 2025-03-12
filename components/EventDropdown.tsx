@@ -19,6 +19,7 @@ export default function EventDropdown({ events }: EventDropdownType) {
             style={{ backgroundColor: checkTimestampToday(item.itemDate) ? "#F45D01" : item.eventStatus ? "#61cd6d" : "#e63946" }}
           >
             <p className={styles.pItem}>{item.timelineItemType}</p>
+            <p className={styles.pItem}>{item.contactTypeCode}</p>
             <p className={styles.pItem}>{timestampToDate(item.itemDate, true)}</p>
 
             <p className={styles.pItem}>{item.createdByUserName || "Unknown"}</p>
