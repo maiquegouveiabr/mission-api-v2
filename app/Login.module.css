@@ -2,12 +2,13 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-image: url("../img/login.png");
-  background-size: cover;
+  background-image: url("../img/login.jpg");
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
   align-items: center;
+  background-color: #fff;
 }
 
 .labelContainer {
@@ -18,7 +19,7 @@
 
 .label {
   font-size: 18px;
-  color: var(--font-color);
+  color: var(--font-warning);
   font-weight: bold;
 }
 
@@ -28,7 +29,7 @@
   border-width: 1px;
   border-color: var(--font-color);
   background-color: #fff;
-  color: var(--font-color);
+  color: var(--font-warning);
   padding: 0.3rem;
 }
 

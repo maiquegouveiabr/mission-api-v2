@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: var(--background); /* Equivalent to bg-gray-100 */
+  background-color: var(--foreground); /* Equivalent to bg-gray-100 */
 }
 
 .inner {

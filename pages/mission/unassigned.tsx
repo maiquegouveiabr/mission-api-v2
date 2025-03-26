@@ -4,7 +4,7 @@ import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Title from "@/components/Title";
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -266,22 +266,28 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setActiveFilter(5);
   };
 
+  // header button
+  const buttonStyle: CSSProperties = {
+    backgroundColor: "#FAF0CA",
+    color: "#3a1c50",
+    fontWeight: "bold",
+    fontFamily: "Verdana",
+  };
+
+  // header button group
+  const headerButtonGroupStyle: CSSProperties = { padding: "5px", backgroundColor: "#3a1c50" };
+
+  // person item button style
+  const personBtnStyle: CSSProperties = {
+    minHeight: "40px",
+    backgroundColor: "#009daa",
+    fontFamily: "Verdana",
+  };
+
   return loadingReferrals ? (
     <LoadingPage />
   ) : (
-    <div className={styles.container}>
-      {currentReferral && (
-        <SimpleDialog
-          postSent={handlePostSentReferral}
-          data={areas ? areas : []}
-          open={dialogOpen}
-          onClose={() => {
-            setDialogOpen(false);
-            setCurrentReferral(null);
-          }}
-          referral={currentReferral}
-        />
-      )}
+    <>
       <div className={styles.titleContainer}>
         <div
           style={{
@@ -293,95 +299,98 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         >
           <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
         </div>
-        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={{ padding: "5px", backgroundColor: "#2f4858" }}>
+        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={headerButtonGroupStyle}>
           {dataLoaded && (
-            <Button onClick={handleSetFilterUBA} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
+            <Button onClick={handleSetFilterUBA} style={buttonStyle}>
               {TitleOption.OPTION_2}
             </Button>
           )}
           {dataLoaded && (
-            <Button
-              onClick={handleFilterReferralsFromToday}
-              style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}
-            >
+            <Button onClick={handleFilterReferralsFromToday} style={buttonStyle}>
               Today's
             </Button>
           )}
           {dataLoaded && (
-            <Button
-              onClick={handleFilterReferralsFromYesterday}
-              style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}
-            >
+            <Button onClick={handleFilterReferralsFromYesterday} style={buttonStyle}>
               Yesterday's
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleTwoPlusEvents} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
+            <Button onClick={handleTwoPlusEvents} style={buttonStyle}>
               {TitleOption.OPTION_3}
             </Button>
           )}
           {dataLoaded && (
-            <Button onClick={handleWithoutAttempts3days} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
+            <Button onClick={handleWithoutAttempts3days} style={buttonStyle}>
               {TitleOption.OPTION_4}
             </Button>
           )}
           {!dataLoaded && (
-            <Button onClick={handleLoadData} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
+            <Button onClick={handleLoadData} style={buttonStyle}>
               Load
             </Button>
           )}
-          <Button onClick={handleSetDate} style={{ backgroundColor: "#FAF0CA", color: "#2f4858", fontWeight: "bold", fontFamily: "Verdana" }}>
+          <Button onClick={handleSetDate} style={buttonStyle}>
             <SwapVertIcon />
           </Button>
         </ButtonGroup>
       </div>
-      <UnassignedList>
-        {filteredReferrals.map((ref) => (
-          <div key={ref.personGuid}>
-            <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
 
-            <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button
-                onClick={() => handleDeleteReferral(ref)}
-                variant="contained"
-                style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
-              >
-                <DeleteIcon style={{ color: "white" }} />
-              </Button>
-              {dataLoaded && ref.contactInfo && (
-                <Button onClick={() => handleClick(ref)} variant="contained" style={{ minHeight: "40px", backgroundColor: "#5aaa95", fontFamily: "Verdana" }}>
-                  <ContentCopyIcon />
-                </Button>
-              )}
-              {!ref.contactInfo && dataLoaded && (
+      <div className={styles.container}>
+        {currentReferral && (
+          <SimpleDialog
+            postSent={handlePostSentReferral}
+            data={areas ? areas : []}
+            open={dialogOpen}
+            onClose={() => {
+              setDialogOpen(false);
+              setCurrentReferral(null);
+            }}
+            referral={currentReferral}
+          />
+        )}
+        <UnassignedList>
+          {filteredReferrals.map((ref) => (
+            <div key={ref.personGuid}>
+              <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
+              <ButtonGroup variant="outlined" aria-label="Basic button group">
                 <Button
-                  onClick={() => handleLoadReferralInfo(ref)}
+                  onClick={() => handleDeleteReferral(ref)}
                   variant="contained"
-                  style={{ minHeight: "40px", backgroundColor: "#5aaa95", fontFamily: "Verdana" }}
+                  style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
                 >
-                  <PhoneIcon />
+                  <DeleteIcon style={{ color: "white" }} />
                 </Button>
-              )}
-
-              {dataLoaded && (
-                <Button
-                  onClick={() => handleOfferItem(ref)}
-                  variant="outlined"
-                  style={{ minHeight: "40px", borderColor: "#5aaa95", color: "#5aaa95", fontFamily: "Verdana" }}
-                >
-                  Offer
-                </Button>
-              )}
-              {dataLoaded && ref.contactInfo && !ref.sentStatus && (
-                <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#5aaa95", fontFamily: "Verdana" }}>
-                  <SendIcon style={{ color: "#5aaa95" }} />
-                </Button>
-              )}
-            </ButtonGroup>
-          </div>
-        ))}
-      </UnassignedList>
-    </div>
+                {dataLoaded && ref.contactInfo && (
+                  <Button onClick={() => handleClick(ref)} variant="contained" style={personBtnStyle}>
+                    <ContentCopyIcon />
+                  </Button>
+                )}
+                {!ref.contactInfo && dataLoaded && (
+                  <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={personBtnStyle}>
+                    <PhoneIcon />
+                  </Button>
+                )}
+                {dataLoaded && (
+                  <Button
+                    onClick={() => handleOfferItem(ref)}
+                    variant="outlined"
+                    style={{ minHeight: "40px", borderColor: "#009daa", color: "#009daa", fontFamily: "Verdana" }}
+                  >
+                    Offer
+                  </Button>
+                )}
+                {dataLoaded && ref.contactInfo && !ref.sentStatus && (
+                  <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#009daa", fontFamily: "Verdana" }}>
+                    <SendIcon style={{ color: "#009daa" }} />
+                  </Button>
+                )}
+              </ButtonGroup>
+            </div>
+          ))}
+        </UnassignedList>
+      </div>
+    </>
   );
 }
 

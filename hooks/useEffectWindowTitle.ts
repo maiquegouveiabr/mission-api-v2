@@ -1,6 +1,6 @@
 import { WindowSettings } from "@/interfaces";
 import { useEffect } from "react";
-import icon from "@/img/naruto-icon.png";
+import icon from "@/img/favicon/web-app-manifest-512x512.png";
 
 export default function (window: WindowSettings) {
   useEffect(() => {

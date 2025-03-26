@@ -3,12 +3,10 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  margin-bottom: 1rem;
   top: 0;
   left: 0;
   position: fixed;
   z-index: 1000;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   background-color: var(--header);
 }
 
@@ -17,16 +15,24 @@
 }
 
 .container {
-  background-image: url("../../img/unassigned.png");
-  background-size: cover;
+  background-image: url("../../img/home.png");
+  background-size: contain;
   background-position: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;
   padding: 10px;
   min-height: 100vh;
+  background-color: var(--foreground);
 }
 
 .headerBtn {
   background-color: #faf0ca;
   color: red;
+}
+
+.headerButton {
+  background-color: "#FAF0CA";
+  color: "#3a1c50";
+  font-weight: "bold";
+  font-family: "Verdana";
 }

@@ -150,7 +150,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
           disabled={sending}
           onClick={handleSend}
           variant="outlined"
-          style={{ backgroundColor: "#f45d01", color: "white", fontWeight: "bold", border: "none" }}
+          style={{ backgroundColor: "#5b6d31", color: "white", fontWeight: "bold", border: "none" }}
         >
           Send
         </Button>

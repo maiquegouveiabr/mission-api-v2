@@ -1,5 +1,5 @@
 .mainContainer {
-  background-color: #5aaa95;
+  background-color: var(--header);
   max-width: 60%;
   width: fit-content;
   padding: 0.7rem;
