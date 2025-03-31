@@ -33,7 +33,10 @@ function isTimestampAfterReference(reference: string, timestamp: number | string
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const { refreshToken, date, save } = req.query;
 
-  const data = await fetchData("https://referralmanager.churchofjesuschrist.org/services/people/mission/14319", String(refreshToken));
+  const data = await fetchData(
+    "https://referralmanager.churchofjesuschrist.org/services/people/mission/14319?includeDroppedPersons=true",
+    String(refreshToken)
+  );
   const rawReferrals: Referral[] = data.persons;
 
   if (!refreshToken) {
@@ -51,8 +54,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       !referrals.some((ref) => ref.id === raw.personGuid) &&
       checkValidZone(raw.zoneId) &&
       isTimestampAfterReference(String(date), raw.createDate) &&
-      (raw.referralStatusId === 20 || raw.referralStatusId === 10) &&
-      raw.personStatusId !== 40
+      !raw.personGuid.includes("-")
   );
 
   if (save === "true" && filtered.length > 0) {
