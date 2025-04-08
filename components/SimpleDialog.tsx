@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import Selector from "@/components/Selector";
-import { Area, Referral } from "@/interfaces";
+import { Area, Referral, User } from "@/interfaces";
 import { SelectChangeEvent } from "@mui/material";
 import DisabledByDefaultOutlinedIcon from "@mui/icons-material/DisabledByDefaultOutlined";
 import styles from "@/components/styles/SimpleDialog.module.css";
@@ -14,21 +14,13 @@ interface SimpleDialogProps {
   data: Area[];
   referral: Referral;
   postSent: (referral: Referral, offer: string, areaId: number) => void;
+  who_data: {
+    id: number;
+    name: string;
+  }[];
 }
 
-const WHO_DATA = [
-  { id: 9, name: "Pilarzinho B" },
-  { id: 1, name: "Pilarzinho R" },
-  { id: 2, name: "Pilarzinho H" },
-  { id: 3, name: "Elder Gouveia" },
-  { id: 4, name: "Elder Bentes" },
-  { id: 5, name: "Capão" },
-  { id: 6, name: "Boa Vista" },
-  { id: 7, name: "Nova Esperança" },
-  { id: 8, name: "Cachoeira 1" },
-];
-
-export default function SimpleDialog({ onClose, data, open, referral, postSent }: SimpleDialogProps) {
+export default function SimpleDialog({ onClose, data, open, referral, postSent, who_data }: SimpleDialogProps) {
   const [areaId, setAreaId] = useState(1000);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
@@ -71,7 +63,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
     const data = {
       id: referral.personGuid,
       name,
-      who_sent: WHO_DATA.find((item) => item.id === sender)?.name,
+      who_sent: who_data.find((item) => item.id === sender)?.name,
       other: otherText,
       area_id: area,
       offer: offerText,
@@ -133,7 +125,7 @@ export default function SimpleDialog({ onClose, data, open, referral, postSent }
           value={offer}
           onChange={(event) => setOffer(event.target.value)}
         />
-        <Selector onChange={handleSelectorChangeWho} currentValue={sender} inputLabel="Who" data={WHO_DATA} />
+        <Selector onChange={handleSelectorChangeWho} currentValue={sender} inputLabel="Who" data={who_data} />
         <Selector onChange={handleSelectorChange} currentValue={areaId} inputLabel="Area" data={data} />
         {(areaId === 0 || areaId === 1 || areaId === 2) && (
           <TextField

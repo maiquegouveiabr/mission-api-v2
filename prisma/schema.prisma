@@ -28,7 +28,7 @@ model baptism {
 
 model reference {
   id        String   @id
-  sent_date DateTime @default(now()) @db.Timestamptz(6)
+  sent_date DateTime @default(now()) @db.Timestamp(6)
   name      String
   area_id   Int
   other     String?
@@ -67,4 +67,11 @@ model zone {
   baptism              baptism[]
   referral             referral[]
   uncontacted_referral uncontacted_referral[]
+}
+
+model user {
+  user_id     Int      @id @default(autoincrement())
+  name        String   @unique
+  is_active   Boolean? @default(true)
+  create_date DateTime @default(now()) @db.Timestamptz(6)
 }

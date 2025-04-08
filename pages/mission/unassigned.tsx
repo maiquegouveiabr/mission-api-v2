@@ -24,7 +24,7 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/navigation";
 import filterReferralsFromToday from "@/util/filterReferralsFromToday";
 import filterReferralsFromYesterday from "@/util/filterReferralsFromYesterday";
-import EventDropdown from "@/components/EventDropdown";
+import { useUsers } from "@/hooks/useUsers";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -34,13 +34,13 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState(0);
   const [dateState, setDateState] = useState(true);
-  const [attemptsState, setAttemptsState] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [openOfferReferral, setOpenOfferReferral] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
   const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken), router);
   const { areas, areasLoading } = useAreas(router);
+  const { users, loading } = useUsers(router);
 
   useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
 
@@ -339,6 +339,12 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       <div className={styles.container}>
         {currentReferral && (
           <SimpleDialog
+            who_data={users.map((item) => {
+              return {
+                id: item.user_id,
+                name: item.name,
+              };
+            })}
             postSent={handlePostSentReferral}
             data={areas ? areas : []}
             open={dialogOpen}

@@ -423,3 +423,10 @@ enum ZoneEnum {
   PONTA_GROSSA_NORTE = 500251576,
   APS = 500625797,
 }
+
+export interface User {
+  user_id: number;
+  name: string;
+  is_active: boolean | null;
+  create_date: Date;
+}
