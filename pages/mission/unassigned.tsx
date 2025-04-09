@@ -7,7 +7,6 @@ import Title from "@/components/Title";
 import { CSSProperties, useState } from "react";
 import styles from "./unassigned.module.css";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import timestampToDate from "@/util/timestampToDate";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -25,19 +24,24 @@ import { useRouter } from "next/navigation";
 import filterReferralsFromToday from "@/util/filterReferralsFromToday";
 import filterReferralsFromYesterday from "@/util/filterReferralsFromYesterday";
 import { useUsers } from "@/hooks/useUsers";
+import DatePicker from "@/components/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import HeaderButtonGroup from "@/components/HeaderButtonGroup";
+import unassigned from "../api/referrals/unassigned";
 
 interface UnassignedProps {
   refreshToken: string;
 }
 
 export default function Unassigned({ refreshToken }: UnassignedProps) {
-  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState(0);
   const [dateState, setDateState] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [openOfferReferral, setOpenOfferReferral] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentReferral, setCurrentReferral] = useState<Referral | null>(null);
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const router = useRouter();
   const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken), router);
   const { areas, areasLoading } = useAreas(router);
   const { users, loading } = useUsers(router);
@@ -51,10 +55,10 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setActiveFilter(1);
   };
 
-  const handleSetDate = () => {
+  const handleSetDateOrder = () => {
     setDateState((prev) => !prev);
     setActiveFilter(0);
-
+    setDate(null);
     // Create a new sorted array without mutating the original state
     const sortedReferrals = [...referrals].sort((a, b) => (dateState ? a.createDate - b.createDate : b.createDate - a.createDate));
 
@@ -194,20 +198,21 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     }
   };
 
-  const handleTwoPlusEvents = () => {
+  const handleThreePlusEvents = () => {
     const copyUnassigned = [...referrals];
     const filteredCopy = copyUnassigned.filter((ref) => {
       if (ref.contactAttempts) {
         if (ref.contactAttempts.length >= 4) {
           return true;
         }
-        if (ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
+        if (ref.contactAttempts.length >= 3 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
       }
       return false;
     });
 
     setFilteredReferrals(filteredCopy);
     setActiveFilter(2);
+    setDate(null);
   };
 
   const handleOpenDialog = async (referral: Referral) => {
@@ -229,11 +234,12 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     }
   };
 
-  const handleWithoutAttempts3days = () => {
+  const handleNoEventsThreeDays = () => {
     const copy = [...referrals];
     const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
     setFilteredReferrals(filteredCopy);
     setActiveFilter(3);
+    setDate(null);
   };
 
   const handlePostSentReferral = (referral: Referral, offer?: string, areaId?: number) => {
@@ -254,28 +260,16 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setFilteredReferrals(filteredReferrals.filter((ref) => ref.personGuid !== referral.personGuid));
   };
 
-  const handleFilterReferralsFromToday = () => {
-    const filtered = filterReferralsFromToday(referrals);
-    setFilteredReferrals(filtered);
-    setActiveFilter(4);
+  const handleDateChange = (newValue: Dayjs | null) => {
+    if (newValue) {
+      const filtered = referrals.filter((ref) => newValue.isSame(dayjs(ref.createDate), "day"));
+      setFilteredReferrals(filtered);
+    } else {
+      setFilteredReferrals([...referrals]);
+    }
+    setActiveFilter(0);
+    setDate(newValue);
   };
-
-  const handleFilterReferralsFromYesterday = () => {
-    const filtered = filterReferralsFromYesterday(referrals);
-    setFilteredReferrals(filtered);
-    setActiveFilter(5);
-  };
-
-  // header button
-  const buttonStyle: CSSProperties = {
-    backgroundColor: "#FAF0CA",
-    color: "#3a1c50",
-    fontWeight: "bold",
-    fontFamily: "Verdana",
-  };
-
-  // header button group
-  const headerButtonGroupStyle: CSSProperties = { padding: "5px", backgroundColor: "#3a1c50" };
 
   // person item button style
   const personBtnStyle: CSSProperties = {
@@ -287,53 +281,21 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   return loadingReferrals ? (
     <LoadingPage />
   ) : (
-    <>
-      <div className={styles.titleContainer}>
-        <div
-          style={{
-            width: "50%",
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-          }}
-        >
+    <div>
+      <div className={styles.headerContainer}>
+        <div className={styles.titleContainer}>
           <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
         </div>
-        <ButtonGroup variant="contained" aria-label="Basic button group" color="inherit" style={headerButtonGroupStyle}>
-          {dataLoaded && (
-            <Button onClick={handleSetFilterUBA} style={buttonStyle}>
-              {TitleOption.OPTION_2}
-            </Button>
-          )}
-          {dataLoaded && (
-            <Button onClick={handleFilterReferralsFromToday} style={buttonStyle}>
-              Today's
-            </Button>
-          )}
-          {dataLoaded && (
-            <Button onClick={handleFilterReferralsFromYesterday} style={buttonStyle}>
-              Yesterday's
-            </Button>
-          )}
-          {dataLoaded && (
-            <Button onClick={handleTwoPlusEvents} style={buttonStyle}>
-              {TitleOption.OPTION_3}
-            </Button>
-          )}
-          {dataLoaded && (
-            <Button onClick={handleWithoutAttempts3days} style={buttonStyle}>
-              {TitleOption.OPTION_4}
-            </Button>
-          )}
-          {!dataLoaded && (
-            <Button onClick={handleLoadData} style={buttonStyle}>
-              Load
-            </Button>
-          )}
-          <Button onClick={handleSetDate} style={buttonStyle}>
-            <SwapVertIcon />
-          </Button>
-        </ButtonGroup>
+        <div className={styles.headerFilterContainer}>
+          <HeaderButtonGroup
+            dataLoaded={dataLoaded}
+            onLoadData={handleLoadData}
+            onSetDateOrder={handleSetDateOrder}
+            onThreePlusEvents={handleThreePlusEvents}
+            onNoEventsThreeDays={handleNoEventsThreeDays}
+          />
+          <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} />
+        </div>
       </div>
 
       <div className={styles.container}>
@@ -396,7 +358,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
           ))}
         </UnassignedList>
       </div>
-    </>
+    </div>
   );
 }
 
