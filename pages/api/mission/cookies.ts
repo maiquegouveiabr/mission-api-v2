@@ -6,10 +6,11 @@ import puppeteer from "puppeteer";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const BROWSERLESS_API = process.env.BROWSERLESS_API;
   const { username } = req.body;
   const { password } = req.body;
   const browser = await puppeteer.connect({
-    browserWSEndpoint: `wss://chrome.browserless.io?token=RgUZmLd0KF5gxG3b93d4771a20b2783b6d4ba1ed21`,
+    browserWSEndpoint: BROWSERLESS_API,
   });
 
   try {
