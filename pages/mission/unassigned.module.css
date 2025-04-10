@@ -26,11 +26,11 @@
 }
 
 .container {
-  background-image: url("../../img/home.png");
+  /* background-image: url("../../img/home.png");
   background-size: contain;
   background-position: 100%;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: fixed; */
   min-height: 100vh;
   background-color: var(--foreground);
   padding-left: 1rem;

@@ -410,8 +410,10 @@ export enum TitleOption {
 }
 
 export enum WindowSettings {
-  LOGIN_WINDOW = "Welcome to Berk",
-  UNASSIGNED_WINDOW = "This is toothless",
+  // LOGIN_WINDOW = "Welcome to Berk",
+  // UNASSIGNED_WINDOW = "This is toothless",
+  LOGIN_WINDOW = "Referral Manager Plus",
+  UNASSIGNED_WINDOW = "Referral Manager Plus",
 }
 
 enum ZoneEnum {
