@@ -198,14 +198,14 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     }
   };
 
-  const handleThreePlusEvents = () => {
+  const handleTwoPlusEvents = () => {
     const copyUnassigned = [...referrals];
     const filteredCopy = copyUnassigned.filter((ref) => {
       if (ref.contactAttempts) {
-        if (ref.contactAttempts.length >= 4) {
+        if (ref.contactAttempts.length >= 3) {
           return true;
         }
-        if (ref.contactAttempts.length >= 3 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
+        if (ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
       }
       return false;
     });
@@ -291,7 +291,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
             dataLoaded={dataLoaded}
             onLoadData={handleLoadData}
             onSetDateOrder={handleSetDateOrder}
-            onThreePlusEvents={handleThreePlusEvents}
+            onThreePlusEvents={handleTwoPlusEvents}
             onNoEventsThreeDays={handleNoEventsThreeDays}
           />
           <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} />
