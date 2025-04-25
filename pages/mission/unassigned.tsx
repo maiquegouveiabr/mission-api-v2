@@ -21,13 +21,11 @@ import useReferrals from "@/hooks/useReferrals";
 import LoadingPage from "@/components/LoadingPage";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/navigation";
-import filterReferralsFromToday from "@/util/filterReferralsFromToday";
-import filterReferralsFromYesterday from "@/util/filterReferralsFromYesterday";
 import { useUsers } from "@/hooks/useUsers";
 import DatePicker from "@/components/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import HeaderButtonGroup from "@/components/HeaderButtonGroup";
-import unassigned from "../api/referrals/unassigned";
+import handleOfferItem from "@/util/unassigned/handleOfferItem";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -47,13 +45,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const { users, loading } = useUsers(router);
 
   useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
-
-  const handleSetFilterUBA = () => {
-    const filtered = referrals.filter((ref) => ref.areaInfo?.organizations?.[0]?.id === 31859);
-
-    setFilteredReferrals(filtered);
-    setActiveFilter(1);
-  };
 
   const handleSetDateOrder = () => {
     setDateState((prev) => !prev);
@@ -161,40 +152,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     } catch (error) {
       console.error("Error loading referral info:", error);
       alert("Failed to load referral info. Please try again.");
-    }
-  };
-
-  const handleOfferItem = async (referral: Referral) => {
-    if (!referral.personOffer && !referral.offerItem) {
-      const isDev = process.env.NODE_ENV === "development";
-      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-      const refreshToken = localStorage.getItem("REFRESH_TOKEN");
-      const response = await fetch(`${url}/api/referrals/offerItemApi?refreshToken=${refreshToken}`, {
-        method: "POST",
-        body: JSON.stringify(referral),
-      });
-      const referralWithOffer: Referral | null = await response.json();
-      const copyUnassigned = [...referrals];
-      const copyFiltered = [...filteredReferrals];
-      if (referralWithOffer) {
-        const index = copyUnassigned.findIndex((ref) => ref.personGuid === referral.personGuid);
-        if (index !== -1) {
-          copyUnassigned[index] = referralWithOffer;
-        }
-        const indexFiltered = copyFiltered.findIndex((ref) => ref.personGuid === referral.personGuid);
-        if (index !== -1) {
-          copyFiltered[indexFiltered] = referralWithOffer;
-        }
-      }
-      setFilteredReferrals(copyFiltered);
-      setReferrals(copyUnassigned);
-      setOpenOfferReferral(referral.personGuid);
-    } else {
-      if (openOfferReferral === referral.personGuid) {
-        setOpenOfferReferral("");
-      } else {
-        setOpenOfferReferral(referral.personGuid);
-      }
     }
   };
 
@@ -341,7 +298,18 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
                 )}
                 {dataLoaded && (
                   <Button
-                    onClick={() => handleOfferItem(ref)}
+                    onClick={() =>
+                      handleOfferItem(
+                        refreshToken,
+                        filteredReferrals,
+                        ref,
+                        referrals,
+                        openOfferReferral,
+                        setFilteredReferrals,
+                        setReferrals,
+                        setOpenOfferReferral
+                      )
+                    }
                     variant="outlined"
                     style={{ minHeight: "40px", borderColor: "#009daa", color: "#009daa", fontFamily: "Verdana" }}
                   >
