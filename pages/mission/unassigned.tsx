@@ -1,4 +1,4 @@
-import { Referral, TitleOption, WindowSettings } from "@/interfaces";
+import { Referral, TitleOption } from "@/interfaces";
 import UnassignedList from "@/components/UnassignedList";
 import ReferralItem from "@/components/ReferralItem";
 import Button from "@mui/material/Button";
@@ -15,7 +15,6 @@ import SimpleDialog from "@/components/SimpleDialog";
 import SendIcon from "@mui/icons-material/Send";
 import checkTimestamp3DaysOld from "@/util/checkTimestamp3DaysOld";
 import checkTimestampToday from "@/util/checkTimestampToday";
-import useEffectWindowTitle from "@/hooks/useEffectWindowTitle";
 import { useAreas } from "@/hooks/useAreas";
 import useReferrals from "@/hooks/useReferrals";
 import LoadingPage from "@/components/LoadingPage";
@@ -43,8 +42,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken), router);
   const { areas, areasLoading } = useAreas(router);
   const { users, loading } = useUsers(router);
-
-  useEffectWindowTitle(WindowSettings.UNASSIGNED_WINDOW);
 
   const handleSetDateOrder = () => {
     setDateState((prev) => !prev);

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 import { Cookie } from "puppeteer";
 import { WindowSettings } from "@/interfaces";
-import useEffectWindowTitle from "@/hooks/useEffectWindowTitle";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -50,8 +49,6 @@ const Login: React.FC = () => {
       alert("Login failed. Please try again.");
     }
   };
-
-  useEffectWindowTitle(WindowSettings.LOGIN_WINDOW);
 
   return (
     <div className={styles.container}>
