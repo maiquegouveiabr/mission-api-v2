@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Referral Manager",
+  title: "Referral Manager | Sign In",
   description: "Created by Elder Gouveia",
 };
 

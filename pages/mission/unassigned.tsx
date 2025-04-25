@@ -25,6 +25,7 @@ import DatePicker from "@/components/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import HeaderButtonGroup from "@/components/HeaderButtonGroup";
 import handleOfferItem from "@/util/unassigned/handleOfferItem";
+import Head from "next/head";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -232,98 +233,109 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     fontFamily: "Verdana",
   };
 
-  return loadingReferrals ? (
-    <LoadingPage />
-  ) : (
-    <div>
-      <div className={styles.headerContainer}>
-        <div className={styles.titleContainer}>
-          <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
-        </div>
-        <div className={styles.headerFilterContainer}>
-          <HeaderButtonGroup
-            dataLoaded={dataLoaded}
-            onLoadData={handleLoadData}
-            onSetDateOrder={handleSetDateOrder}
-            onThreePlusEvents={handleTwoPlusEvents}
-            onNoEventsThreeDays={handleNoEventsThreeDays}
-          />
-          <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} />
-        </div>
-      </div>
-
-      <div className={styles.container}>
-        {currentReferral && (
-          <SimpleDialog
-            who_data={users.map((item) => {
-              return {
-                id: item.user_id,
-                name: item.name,
-              };
-            })}
-            postSent={handlePostSentReferral}
-            data={areas ? areas : []}
-            open={dialogOpen}
-            onClose={() => {
-              setDialogOpen(false);
-              setCurrentReferral(null);
-            }}
-            referral={currentReferral}
-          />
-        )}
-        <UnassignedList>
-          {filteredReferrals.map((ref) => (
-            <div key={ref.personGuid}>
-              <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
-              <ButtonGroup variant="outlined" aria-label="Basic button group">
-                <Button
-                  onClick={() => handleDeleteReferral(ref)}
-                  variant="contained"
-                  style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
-                >
-                  <DeleteIcon style={{ color: "white" }} />
-                </Button>
-                {dataLoaded && ref.contactInfo && (
-                  <Button onClick={() => handleClick(ref)} variant="contained" style={personBtnStyle}>
-                    <ContentCopyIcon />
-                  </Button>
-                )}
-                {!ref.contactInfo && dataLoaded && (
-                  <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={personBtnStyle}>
-                    <PhoneIcon />
-                  </Button>
-                )}
-                {dataLoaded && (
-                  <Button
-                    onClick={() =>
-                      handleOfferItem(
-                        refreshToken,
-                        filteredReferrals,
-                        ref,
-                        referrals,
-                        openOfferReferral,
-                        setFilteredReferrals,
-                        setReferrals,
-                        setOpenOfferReferral
-                      )
-                    }
-                    variant="outlined"
-                    style={{ minHeight: "40px", borderColor: "#009daa", color: "#009daa", fontFamily: "Verdana" }}
-                  >
-                    Offer
-                  </Button>
-                )}
-                {dataLoaded && ref.contactInfo && !ref.sentStatus && (
-                  <Button onClick={() => handleOpenDialog(ref)} variant="outlined" style={{ minHeight: "40px", borderColor: "#009daa", fontFamily: "Verdana" }}>
-                    <SendIcon style={{ color: "#009daa" }} />
-                  </Button>
-                )}
-              </ButtonGroup>
+  return (
+    <>
+      <Head>
+        <title>Referral Manager | Unassigned</title>
+        <meta name="description" content="Created by Elder Gouveia." />
+      </Head>
+      {loadingReferrals && <LoadingPage />}
+      {!loadingReferrals && (
+        <div>
+          <div className={styles.headerContainer}>
+            <div className={styles.titleContainer}>
+              <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
             </div>
-          ))}
-        </UnassignedList>
-      </div>
-    </div>
+            <div className={styles.headerFilterContainer}>
+              <HeaderButtonGroup
+                dataLoaded={dataLoaded}
+                onLoadData={handleLoadData}
+                onSetDateOrder={handleSetDateOrder}
+                onThreePlusEvents={handleTwoPlusEvents}
+                onNoEventsThreeDays={handleNoEventsThreeDays}
+              />
+              <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} />
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            {currentReferral && (
+              <SimpleDialog
+                who_data={users.map((item) => {
+                  return {
+                    id: item.user_id,
+                    name: item.name,
+                  };
+                })}
+                postSent={handlePostSentReferral}
+                data={areas ? areas : []}
+                open={dialogOpen}
+                onClose={() => {
+                  setDialogOpen(false);
+                  setCurrentReferral(null);
+                }}
+                referral={currentReferral}
+              />
+            )}
+            <UnassignedList>
+              {filteredReferrals.map((ref) => (
+                <div key={ref.personGuid}>
+                  <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
+                  <ButtonGroup variant="outlined" aria-label="Basic button group">
+                    <Button
+                      onClick={() => handleDeleteReferral(ref)}
+                      variant="contained"
+                      style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
+                    >
+                      <DeleteIcon style={{ color: "white" }} />
+                    </Button>
+                    {dataLoaded && ref.contactInfo && (
+                      <Button onClick={() => handleClick(ref)} variant="contained" style={personBtnStyle}>
+                        <ContentCopyIcon />
+                      </Button>
+                    )}
+                    {!ref.contactInfo && dataLoaded && (
+                      <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={personBtnStyle}>
+                        <PhoneIcon />
+                      </Button>
+                    )}
+                    {dataLoaded && (
+                      <Button
+                        onClick={() =>
+                          handleOfferItem(
+                            refreshToken,
+                            filteredReferrals,
+                            ref,
+                            referrals,
+                            openOfferReferral,
+                            setFilteredReferrals,
+                            setReferrals,
+                            setOpenOfferReferral
+                          )
+                        }
+                        variant="outlined"
+                        style={{ minHeight: "40px", borderColor: "#009daa", color: "#009daa", fontFamily: "Verdana" }}
+                      >
+                        Offer
+                      </Button>
+                    )}
+                    {dataLoaded && ref.contactInfo && !ref.sentStatus && (
+                      <Button
+                        onClick={() => handleOpenDialog(ref)}
+                        variant="outlined"
+                        style={{ minHeight: "40px", borderColor: "#009daa", fontFamily: "Verdana" }}
+                      >
+                        <SendIcon style={{ color: "#009daa" }} />
+                      </Button>
+                    )}
+                  </ButtonGroup>
+                </div>
+              ))}
+            </UnassignedList>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
