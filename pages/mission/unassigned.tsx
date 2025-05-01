@@ -1,18 +1,9 @@
+import "@/app/globals.css";
 import { Referral, TitleOption } from "@/interfaces";
-import UnassignedList from "@/components/UnassignedList";
-import ReferralItem from "@/components/ReferralItem";
-import Button from "@mui/material/Button";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Title from "@/components/Title";
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useMemo, useState } from "react";
 import styles from "./unassigned.module.css";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import DeleteIcon from "@mui/icons-material/Delete";
 import timestampToDate from "@/util/timestampToDate";
-import PhoneIcon from "@mui/icons-material/Phone";
-import "../../app/globals.css";
-import SimpleDialog from "@/components/SimpleDialog";
-import SendIcon from "@mui/icons-material/Send";
 import checkTimestamp3DaysOld from "@/util/checkTimestamp3DaysOld";
 import checkTimestampToday from "@/util/checkTimestampToday";
 import { useAreas } from "@/hooks/useAreas";
@@ -24,12 +15,23 @@ import { useUsers } from "@/hooks/useUsers";
 import DatePicker from "@/components/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import HeaderButtonGroup from "@/components/HeaderButtonGroup";
-import handleOfferItem from "@/util/unassigned/handleOfferItem";
 import Head from "next/head";
+import Dialog from "@/components/Dialog";
+import ReferralList from "@/components/ReferralList";
+import { Button } from "@/components/ui/button";
+import { CopyIcon, PhoneIcon, SendIcon, Trash2Icon } from "lucide-react";
+import ReferralItem from "@/components/ReferralItem";
 
 interface UnassignedProps {
   refreshToken: string;
 }
+
+const FILTERS = {
+  ALL: 0,
+  TWO_PLUS: 2,
+  NO_EVENTS_THREE_DAYS: 3,
+  DATE_FILTER: 4,
+};
 
 export default function Unassigned({ refreshToken }: UnassignedProps) {
   const [activeFilter, setActiveFilter] = useState(0);
@@ -48,13 +50,9 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setDateState((prev) => !prev);
     setActiveFilter(0);
     setDate(null);
-    // Create a new sorted array without mutating the original state
-    const sortedReferrals = [...referrals].sort((a, b) => (dateState ? a.createDate - b.createDate : b.createDate - a.createDate));
-
-    setFilteredReferrals(sortedReferrals);
   };
 
-  const handleClick = async (ref: Referral) => {
+  const handleCopy = async (ref: Referral) => {
     if (!ref.areaInfo || !ref.contactInfo) return;
 
     try {
@@ -117,14 +115,13 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       // Update state
       setDataLoaded(true);
       setReferrals(referralsWithAttempts);
-      setFilteredReferrals(referralsWithAttempts);
     } catch (error) {
       console.error("Error loading data:", error);
       alert("Failed to load data. Please try again.");
     }
   };
 
-  const handleLoadReferralInfo = async (referral: Referral) => {
+  const handleLoadPhone = async (referral: Referral) => {
     try {
       const isDev = process.env.NODE_ENV === "development";
       const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
@@ -145,8 +142,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
       // Efficiently update state using map()
       setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? data : ref)));
-
-      setFilteredReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? data : ref)));
     } catch (error) {
       console.error("Error loading referral info:", error);
       alert("Failed to load referral info. Please try again.");
@@ -154,26 +149,13 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   };
 
   const handleTwoPlusEvents = () => {
-    const copyUnassigned = [...referrals];
-    const filteredCopy = copyUnassigned.filter((ref) => {
-      if (ref.contactAttempts) {
-        if (ref.contactAttempts.length >= 3) {
-          return true;
-        }
-        if (ref.contactAttempts.length >= 2 && !checkTimestampToday(ref.contactAttempts[0].itemDate)) return true;
-      }
-      return false;
-    });
-
-    setFilteredReferrals(filteredCopy);
-    setActiveFilter(2);
+    setActiveFilter(FILTERS.TWO_PLUS);
     setDate(null);
   };
 
   const handleOpenDialog = async (referral: Referral) => {
     try {
-      const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-      const response = await fetch(`${API_URL}/api/db/referralExist?id=${referral.personGuid}`);
+      const response = await fetch(`/api/db/referralExist?id=${referral.personGuid}`);
       if (!response.ok) throw new Error(`${response.statusText}`);
       const { exist, who_sent } = await response.json();
       if (exist) {
@@ -190,10 +172,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   };
 
   const handleNoEventsThreeDays = () => {
-    const copy = [...referrals];
-    const filteredCopy = copy.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
-    setFilteredReferrals(filteredCopy);
-    setActiveFilter(3);
+    setActiveFilter(FILTERS.NO_EVENTS_THREE_DAYS);
     setDate(null);
   };
 
@@ -207,31 +186,117 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
     // Update state efficiently
     setReferrals((prev) => prev.map(updateReferral));
-    setFilteredReferrals((prev) => prev.map(updateReferral));
+    setDialogOpen(false);
   };
 
-  const handleDeleteReferral = (referral: Referral) => {
+  const handleDelete = (referral: Referral) => {
     setReferrals(referrals.filter((ref) => ref.personGuid !== referral.personGuid));
-    setFilteredReferrals(filteredReferrals.filter((ref) => ref.personGuid !== referral.personGuid));
   };
 
   const handleDateChange = (newValue: Dayjs | null) => {
-    if (newValue) {
-      const filtered = referrals.filter((ref) => newValue.isSame(dayjs(ref.createDate), "day"));
-      setFilteredReferrals(filtered);
-    } else {
-      setFilteredReferrals([...referrals]);
-    }
-    setActiveFilter(0);
     setDate(newValue);
+    setActiveFilter(FILTERS.DATE_FILTER);
   };
 
-  // person item button style
-  const personBtnStyle: CSSProperties = {
-    minHeight: "40px",
-    backgroundColor: "#009daa",
-    fontFamily: "Verdana",
+  const handleLoadOffer = async (ref: Referral) => {
+    if (!ref.personOffer && !ref.offerItem) {
+      try {
+        const response = await fetch(`/api/referrals/offer?id=${ref.personGuid}&refreshToken=${refreshToken}`);
+
+        if (!response.ok) {
+          const { error, message } = await response.json();
+          alert(message);
+          return;
+        } else {
+          const { offerItem, personOffer } = await response.json();
+          const newRef = {
+            ...ref,
+            offerItem,
+            personOffer,
+          };
+          const copyUnassigned = [...referrals];
+
+          const index = copyUnassigned.findIndex((r) => r.personGuid === ref.personGuid);
+          if (index !== -1) {
+            copyUnassigned[index] = newRef;
+          }
+
+          setReferrals(copyUnassigned);
+          setOpenOfferReferral(ref.personGuid);
+        }
+      } catch (error) {}
+    } else {
+      setOpenOfferReferral(openOfferReferral === ref.personGuid ? "" : ref.personGuid);
+    }
   };
+
+  const handleClearDateFilter = () => {
+    setActiveFilter(0);
+    setDate(null);
+  };
+
+  const filtered = useMemo(() => {
+    if (!referrals) return [];
+
+    switch (activeFilter) {
+      case FILTERS.TWO_PLUS:
+        return referrals.filter((ref) => {
+          const attemps = ref.contactAttempts || [];
+          return attemps.length >= 3 || (attemps.length >= 2 && !checkTimestampToday(attemps[0].itemDate));
+        });
+
+      case FILTERS.NO_EVENTS_THREE_DAYS:
+        return referrals.filter((ref) => ref.contactAttempts.length === 0 && checkTimestamp3DaysOld(ref.createDate));
+
+      case FILTERS.DATE_FILTER:
+        if (!date) return [...referrals];
+        return referrals.filter((ref) => date.isSame(dayjs(ref.createDate), "day"));
+
+      case FILTERS.ALL:
+      default:
+        return [...referrals].sort((a, b) => (dateState ? b.createDate - a.createDate : a.createDate - b.createDate));
+    }
+  }, [referrals, activeFilter, date, dateState]);
+
+  const referralItems = useMemo(() => {
+    return filtered.map((ref) => (
+      <ReferralItem key={ref.personGuid} ref={ref}>
+        <div className="flex flex-row gap-1">
+          <Button className="w-fit cursor-pointer text-red-600 hover:bg-red-600 hover:text-white" onClick={() => handleDelete(ref)} variant="outline">
+            <Trash2Icon />
+          </Button>
+          {dataLoaded && ref.contactInfo && (
+            <Button className="w-fit cursor-pointer text-yellow-600 hover:bg-yellow-600 hover:text-white" onClick={() => handleCopy(ref)} variant="outline">
+              <CopyIcon />
+            </Button>
+          )}
+          {dataLoaded && !ref.contactInfo && (
+            <Button className="w-fit cursor-pointer text-green-600 hover:bg-green-600 hover:text-white" onClick={() => handleLoadPhone(ref)} variant="outline">
+              <PhoneIcon />
+            </Button>
+          )}
+          {dataLoaded && !ref.offerItem && !ref.personOffer && (
+            <Button
+              className="w-fit cursor-pointer text-blue-600 hover:text-blue-600 hover:font-semibold"
+              onClick={() => handleLoadOffer(ref)}
+              variant="outline"
+            >
+              Offer
+            </Button>
+          )}
+          {dataLoaded && ref.contactInfo && !ref.sentStatus && (
+            <Button className="w-fit cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white" onClick={() => handleOpenDialog(ref)} variant="outline">
+              <SendIcon />
+            </Button>
+          )}
+        </div>
+      </ReferralItem>
+    ));
+  }, [filtered, dataLoaded, openOfferReferral]);
+
+  const title = useMemo(() => {
+    return `${Object.values(TitleOption)[activeFilter]} (${filtered.length})`;
+  }, [activeFilter, filtered]);
 
   return (
     <>
@@ -240,11 +305,22 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         <meta name="description" content="Created by Elder Gouveia." />
       </Head>
       {loadingReferrals && <LoadingPage />}
+      {currentReferral && (
+        <Dialog
+          key={currentReferral.personGuid}
+          setOpen={setDialogOpen}
+          ref={currentReferral}
+          users={users}
+          areas={areas}
+          open={dialogOpen}
+          postSent={handlePostSentReferral}
+        />
+      )}
       {!loadingReferrals && (
         <div>
           <div className={styles.headerContainer}>
             <div className={styles.titleContainer}>
-              <Title title={`${Object.values(TitleOption)[activeFilter]} (${filteredReferrals.length})`} />
+              <Title title={title} />
             </div>
             <div className={styles.headerFilterContainer}>
               <HeaderButtonGroup
@@ -254,84 +330,12 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
                 onThreePlusEvents={handleTwoPlusEvents}
                 onNoEventsThreeDays={handleNoEventsThreeDays}
               />
-              <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} />
+              <DatePicker onDateChange={handleDateChange} dataLoaded={dataLoaded} value={date} onClear={handleClearDateFilter} />
             </div>
           </div>
 
           <div className={styles.container}>
-            {currentReferral && (
-              <SimpleDialog
-                who_data={users.map((item) => {
-                  return {
-                    id: item.user_id,
-                    name: item.name,
-                  };
-                })}
-                postSent={handlePostSentReferral}
-                data={areas ? areas : []}
-                open={dialogOpen}
-                onClose={() => {
-                  setDialogOpen(false);
-                  setCurrentReferral(null);
-                }}
-                referral={currentReferral}
-              />
-            )}
-            <UnassignedList>
-              {filteredReferrals.map((ref) => (
-                <div key={ref.personGuid}>
-                  <ReferralItem key={ref.personGuid} referral={ref} dataLoaded={dataLoaded} openOfferReferral={openOfferReferral} />
-                  <ButtonGroup variant="outlined" aria-label="Basic button group">
-                    <Button
-                      onClick={() => handleDeleteReferral(ref)}
-                      variant="contained"
-                      style={{ minHeight: "40px", backgroundColor: "#e63946", fontFamily: "Verdana" }}
-                    >
-                      <DeleteIcon style={{ color: "white" }} />
-                    </Button>
-                    {dataLoaded && ref.contactInfo && (
-                      <Button onClick={() => handleClick(ref)} variant="contained" style={personBtnStyle}>
-                        <ContentCopyIcon />
-                      </Button>
-                    )}
-                    {!ref.contactInfo && dataLoaded && (
-                      <Button onClick={() => handleLoadReferralInfo(ref)} variant="contained" style={personBtnStyle}>
-                        <PhoneIcon />
-                      </Button>
-                    )}
-                    {dataLoaded && (
-                      <Button
-                        onClick={() =>
-                          handleOfferItem(
-                            refreshToken,
-                            filteredReferrals,
-                            ref,
-                            referrals,
-                            openOfferReferral,
-                            setFilteredReferrals,
-                            setReferrals,
-                            setOpenOfferReferral
-                          )
-                        }
-                        variant="outlined"
-                        style={{ minHeight: "40px", borderColor: "#009daa", color: "#009daa", fontFamily: "Verdana" }}
-                      >
-                        Offer
-                      </Button>
-                    )}
-                    {dataLoaded && ref.contactInfo && !ref.sentStatus && (
-                      <Button
-                        onClick={() => handleOpenDialog(ref)}
-                        variant="outlined"
-                        style={{ minHeight: "40px", borderColor: "#009daa", fontFamily: "Verdana" }}
-                      >
-                        <SendIcon style={{ color: "#009daa" }} />
-                      </Button>
-                    )}
-                  </ButtonGroup>
-                </div>
-              ))}
-            </UnassignedList>
+            <ReferralList>{referralItems}</ReferralList>
           </div>
         </div>
       )}

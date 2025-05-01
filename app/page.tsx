@@ -4,27 +4,26 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 import { Cookie } from "puppeteer";
-import { WindowSettings } from "@/interfaces";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Eye, EyeClosed } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const Login: React.FC = () => {
+export default () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [show, setShow] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
-    setIsLoading(true);
-    const isDev = process.env.NODE_ENV === "development";
-    const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
     if (!username || !password) {
-      alert("Both fields are required!");
-      setIsLoading(false);
+      alert("Missing credentials!");
       return;
     }
-
     try {
-      const response = await fetch(`${url}/api/mission/cookies`, {
+      setIsLoading(true);
+      const response = await fetch("/api/mission/cookies", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +32,7 @@ const Login: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        throw new Error(response.statusText);
       }
 
       const cookies: Cookie[] = await response.json();
@@ -45,28 +44,51 @@ const Login: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error("Login error:", error);
-      alert("Login failed. Please try again.");
+      console.error(`LOGIN_ERROR=${error}`);
+      alert(error);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.labelContainer}>
-        <label className={styles.label}>Username</label>
-        <input type="text" className={styles.input} placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+      <div id="form" className="grid gap-5">
+        <div className="grid max-w-sm items-center gap-1.5">
+          <Label className="font-['Poppins-SemiBold',Helvetica] font-semibold" htmlFor="username">
+            Username
+          </Label>
+          <Input
+            className="w-[300px] font-['Poppins',Helvetica] focus-visible:ring-1"
+            type="text"
+            placeholder="Enter Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div className="grid max-w-sm items-center gap-1.5">
+          <Label className="font-['Poppins-SemiBold',Helvetica] font-semibold" htmlFor="password">
+            Password
+          </Label>
+          <div className="relative w-full">
+            <Input
+              className="w-[300px] font-['Poppins', Helvetica] focus-visible:ring-1 pr-10"
+              type={show ? "text" : "password"}
+              placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {!show && <Eye onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />}
+            {show && <EyeClosed onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />}
+          </div>
+        </div>
+        <Button
+          className="w-[300px] cursor-pointer bg-[#14213d] hover:bg-[#14213d] rounded-[3px] text-neutral-200 font-['Poppins-SemiBold',Helvetica] font-semibold text-sm"
+          disabled={isLoading}
+          onClick={handleLogin}
+        >
+          Sign In
+        </Button>
       </div>
-
-      <div className={styles.labelContainer}>
-        <input type="password" className={styles.input} placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <label className={styles.label}>Password</label>
-      </div>
-
-      <button disabled={isLoading} className={styles.loginButton} onClick={handleLogin}>
-        Jump In
-      </button>
     </div>
   );
 };
-
-export default Login;

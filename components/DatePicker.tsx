@@ -1,17 +1,18 @@
-import { useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker as Picker } from "@mui/x-date-pickers/DatePicker";
 import styles from "@/components/styles/DatePicker.module.css";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
+import { Button } from "./ui/button";
 
 interface DatePickerProps {
+  onClear: () => void;
   onDateChange: (date: Dayjs | null) => void;
   dataLoaded: boolean;
   value: Dayjs | null;
 }
 
-function DatePicker({ onDateChange, dataLoaded, value }: DatePickerProps) {
+function DatePicker({ onClear, onDateChange, dataLoaded, value }: DatePickerProps) {
   const handleDateChange = (newValue: Dayjs | null) => {
     onDateChange(newValue);
   };
@@ -29,9 +30,13 @@ function DatePicker({ onDateChange, dataLoaded, value }: DatePickerProps) {
             textField: { size: "small", focused: true, color: "secondary", style: { width: "fit-content" } },
           }}
         />
-        <button className={styles.btn} onClick={() => handleDateChange(null)} disabled={!dataLoaded}>
+        <Button
+          className="rounded-sm font-bold text-[#FFFFFF] bg-[#364153] hover:bg-[#364153] hover:text-[#FFFFFF] p-3 mt-3 transition-none"
+          onClick={onClear}
+          variant="ghost"
+        >
           Clear
-        </button>
+        </Button>
       </div>
     </LocalizationProvider>
   );

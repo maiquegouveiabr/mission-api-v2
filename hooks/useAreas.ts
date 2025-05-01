@@ -3,7 +3,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { useState, useEffect } from "react";
 
 export function useAreas(router: AppRouterInstance) {
-  const [areas, setAreas] = useState<Area[] | null>(null);
+  const [areas, setAreas] = useState<Area[] | []>([]);
   const [areasLoading, setAreasLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

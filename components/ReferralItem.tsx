@@ -1,46 +1,37 @@
 import { Referral } from "@/interfaces";
-import styles from "./styles/ReferralItem.module.css";
 import timestampToDate from "@/util/timestampToDate";
-import Offer from "./Offer";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import checkTimestampToday from "@/util/checkTimestampToday";
-import SpanItem from "./SpanItem";
+import { Card, CardDescription, CardTitle } from "./ui/card";
+import EventList from "./EventList";
+import OfferItem from "./OfferItem";
 
-import EventDropdown from "./EventDropdown";
+type Props = {
+  ref: Referral;
+  children: React.ReactNode;
+};
 
-interface UnassignedReferralItemProps {
-  referral: Referral;
-  dataLoaded: boolean;
-  openOfferReferral: string;
-}
-
-const ReferralItem = ({ referral, openOfferReferral }: UnassignedReferralItemProps) => {
+function ReferralItem({ ref, children }: Props) {
   return (
-    <li className={styles.container}>
-      <div className={styles.wrap}>
-        <a className={styles.linkItem} target="_blank" href={`https://referralmanager.churchofjesuschrist.org/person/${referral.personGuid}`}>
-          <p className={styles.spanItem}>
-            {referral.firstName} {referral.lastName ? referral.lastName : ""}
-          </p>
-        </a>
-        {referral.contactAttempts && referral.contactAttempts.length >= 2 && !checkTimestampToday(referral.contactAttempts[0].itemDate) ? (
-          <ErrorOutlineIcon color="warning" />
-        ) : (
-          referral.contactAttempts && referral.contactAttempts.length >= 3 && <ErrorOutlineIcon color="warning" />
-        )}
-      </div>
-
-      <SpanItem label={timestampToDate(new Date(referral.createDate).getTime(), true)} />
-
-      {referral.contactInfo && <SpanItem label={referral.contactInfo.phoneNumbers[0].number} />}
-
-      <SpanItem label={referral.address} />
-
-      {referral.areaInfo && referral.areaInfo.proselytingAreas && <SpanItem label={`Suggested Area (${referral.areaInfo.proselytingAreas[0].name})`} />}
-      {referral.contactAttempts && referral.contactAttempts.length > 0 && <EventDropdown events={referral.contactAttempts} />}
-      {referral.personOffer && referral.offerItem && openOfferReferral === referral.personGuid && <Offer referral={referral} />}
+    <li>
+      <Card className="w-fit p-3">
+        <div className="flex flex-col gap-1">
+          <CardTitle className="leading-tight text-gray-700">
+            <a href={`https://referralmanager.churchofjesuschrist.org/person/${ref.personGuid}`} target="_blank" rel="noopener noreferrer">
+              {ref.firstName} {ref.lastName ?? ""}
+            </a>
+          </CardTitle>
+          <CardDescription className="leading-tight">{timestampToDate(new Date(ref.createDate).getTime(), true)}</CardDescription>
+          {ref.contactInfo?.phoneNumbers?.[0]?.number && <CardDescription className="leading-tight">{ref.contactInfo.phoneNumbers[0].number}</CardDescription>}
+          <CardDescription className="leading-tight">{ref.address}</CardDescription>
+          {ref.areaInfo?.proselytingAreas?.[0]?.name && (
+            <CardDescription className="leading-tight font-black">Suggested Area: {ref.areaInfo.proselytingAreas[0].name}</CardDescription>
+          )}
+          {ref.contactAttempts && ref.contactAttempts.length > 0 && <EventList events={ref.contactAttempts} />}
+        </div>
+        {children}
+        {ref.personOffer && ref.offerItem && <OfferItem ref={ref} />}
+      </Card>
     </li>
   );
-};
+}
 
 export default ReferralItem;
