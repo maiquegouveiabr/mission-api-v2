@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/Select";
-import { Area, Referral, User } from "@/interfaces";
+import { Area, Referral, UbaArea, User } from "@/interfaces";
 import { useEffect, useMemo, useState } from "react";
 
 const specialAreaLabels: Record<number, string> = {
@@ -15,66 +15,58 @@ const specialAreaLabels: Record<number, string> = {
 type Props = {
   users: User[];
   areas: Area[];
+  uba: UbaArea[];
   ref: Referral | null;
   setOpen: (open: boolean) => void;
   open: boolean;
   postSent: (ref: Referral, offer: string, areaId: number) => void;
 };
 
-export default ({ users, areas, ref, open, setOpen, postSent }: Props) => {
+export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
   if (!ref) return null;
 
+  const [ubaId, setUbaId] = useState<number | null>(null);
   const [areaId, setAreaId] = useState<number | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
   const [sending, setSending] = useState(false);
 
+  const memoizedUsers = useMemo(() => {
+    return users.map((user) => ({
+      id: user.user_id,
+      name: user.name,
+    }));
+  }, [users]);
+
+  const memoizedAreas = useMemo(() => {
+    return areas.map((area) => ({
+      id: area.id,
+      name: area.name,
+    }));
+  }, [areas]);
+
+  const memoizedUba = useMemo(() => {
+    return uba.map((uba) => ({
+      id: uba.id,
+      name: uba.name,
+    }));
+  }, [uba]);
+
   const handleAreaChange = (id: number) => {
     setAreaId(id);
   };
 
-  const handleUserChange = (id: number) => {
-    setUserId(id);
+  const handleUbaAreaChange = (id: number) => {
+    setUbaId(id);
+    const selectedUba = uba.find((item) => item.id === id);
+    if (selectedUba) {
+      setOther(selectedUba.name);
+    }
   };
 
-  const handleSave = async () => {
-    if (!areaId || !userId || !offer) {
-      alert("Please don't forget any fields.");
-      return;
-    } else {
-      if ((areaId === 0 || areaId === 1 || areaId === 2) && !other) {
-        alert("Please don't forget any fields.");
-        return;
-      } else {
-        const data = {
-          id: ref.personGuid,
-          name: ref.firstName,
-          who_sent: users.find((user) => user.user_id === userId)?.name,
-          offer: offer,
-          phone: ref.contactInfo?.phoneNumbers[0].number,
-          area_id: areaId,
-          other: other,
-        };
-        setSending(true);
-        const response = await fetch("/api/db/references", {
-          method: "POST",
-          body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-          if (response.status === 409) {
-            alert("This referral was sent by someone else!");
-            return;
-          } else if (response.status === 500) {
-            alert("INTERNAL_SERVER_ERROR");
-            return;
-          }
-        }
-        postSent(ref, offer.toUpperCase(), areaId);
-        setSending(false);
-        setOpen(false);
-      }
-    }
+  const handleUserChange = (id: number) => {
+    setUserId(id);
   };
 
   const handleSend = async () => {
@@ -163,17 +155,7 @@ export default ({ users, areas, ref, open, setOpen, postSent }: Props) => {
             <Label htmlFor="who" className="text-left">
               Who Are You
             </Label>
-            <Select
-              onChange={handleUserChange}
-              placeholder="Select Missionary"
-              selectLabel="Missionaries"
-              data={useMemo(() => {
-                return users.map((user) => ({
-                  id: user.user_id,
-                  name: user.name,
-                }));
-              }, [users])}
-            />
+            <Select onChange={handleUserChange} placeholder="Select Missionary" selectLabel="Missionaries" data={memoizedUsers} />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="who" className="text-left">
@@ -184,22 +166,23 @@ export default ({ users, areas, ref, open, setOpen, postSent }: Props) => {
               onChange={handleAreaChange}
               placeholder="Select Teaching Area"
               selectLabel="Teaching Area"
-              data={useMemo(() => {
-                return areas.map((area) => {
-                  return {
-                    id: area.id,
-                    name: area.name,
-                  };
-                });
-              }, areas)}
+              data={memoizedAreas}
             />
           </div>
-          {(areaId === 0 || areaId === 1 || areaId === 2) && (
+          {(areaId === 1 || areaId === 2) && (
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="other" className="text-left">
                 {specialAreaLabels[areaId]}
               </Label>
               <Input type="text" value={other} className="col-span-3" onChange={(event) => setOther(event.target.value)} />
+            </div>
+          )}
+          {areaId === 0 && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="who" className="text-left">
+                UBA Area
+              </Label>
+              <Select defaultValue={String(ubaId)} onChange={handleUbaAreaChange} placeholder="Select UBA Area" selectLabel="UBA Area" data={memoizedUba} />
             </div>
           )}
         </div>

@@ -21,6 +21,7 @@ import ReferralList from "@/components/ReferralList";
 import { Button } from "@/components/ui/button";
 import { CopyIcon, PhoneIcon, SendIcon, Trash2Icon } from "lucide-react";
 import ReferralItem from "@/components/ReferralItem";
+import { useUba } from "@/hooks/useUba";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -45,6 +46,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals } = useReferrals(String(refreshToken), router);
   const { areas, areasLoading } = useAreas(router);
   const { users, loading } = useUsers(router);
+  const { uba, loadingUba } = useUba(router);
 
   const handleSetDateOrder = () => {
     setDateState((prev) => !prev);
@@ -312,6 +314,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
           ref={currentReferral}
           users={users}
           areas={areas}
+          uba={uba}
           open={dialogOpen}
           postSent={handlePostSentReferral}
         />

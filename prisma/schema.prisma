@@ -75,3 +75,8 @@ model user {
   is_active   Boolean? @default(true)
   create_date DateTime @default(now()) @db.Timestamptz(6)
 }
+
+model uba_area {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}

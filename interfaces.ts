@@ -432,3 +432,8 @@ export interface User {
   is_active: boolean | null;
   create_date: Date;
 }
+
+export interface UbaArea {
+  id: number;
+  name: string;
+}
