@@ -148,6 +148,7 @@ export interface Referral {
   phoneHomeTextable: boolean;
   sentStatus: boolean;
   offerText?: string;
+  phoneMatches: { id: string; phone: string; name: string }[] | null;
 }
 
 export interface ContactInfo {

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { CopyIcon, PhoneIcon, SendIcon, Trash2Icon } from "lucide-react";
 import ReferralItem from "@/components/ReferralItem";
 import { useUba } from "@/hooks/useUba";
+import fetchPhoneMatch from "@/util/api/fetchPhoneMatch";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -125,14 +126,12 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
   const handleLoadPhone = async (referral: Referral) => {
     try {
-      const isDev = process.env.NODE_ENV === "development";
-      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
 
       if (!refreshToken) throw new Error("No refresh token found.");
 
       // Fetch referral info
-      const response = await fetch(`${url}/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+      const response = await fetch(`/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
         method: "POST",
 
         body: JSON.stringify(referral),
@@ -141,9 +140,13 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       if (!response.ok) throw new Error(`Failed to fetch referral info: ${response.statusText}`);
 
       const data = await response.json();
-
+      const phoneMatches = await fetchPhoneMatch(data.contactInfo.phoneNumbers?.[0]?.number);
+      const newData = {
+        ...data,
+        phoneMatches,
+      };
       // Efficiently update state using map()
-      setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? data : ref)));
+      setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? newData : ref)));
     } catch (error) {
       console.error("Error loading referral info:", error);
       alert("Failed to load referral info. Please try again.");

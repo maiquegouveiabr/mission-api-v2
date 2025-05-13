@@ -3,6 +3,7 @@ import timestampToDate from "@/util/timestampToDate";
 import { Card, CardDescription, CardTitle } from "./ui/card";
 import EventList from "./EventList";
 import OfferItem from "./OfferItem";
+import PhoneMatchList from "./PhoneMatchList";
 
 type Props = {
   ref: Referral;
@@ -28,6 +29,7 @@ function ReferralItem({ ref, children }: Props) {
           {ref.contactAttempts && ref.contactAttempts.length > 0 && <EventList events={ref.contactAttempts} />}
         </div>
         {children}
+        {ref.phoneMatches && ref.phoneMatches.length > 0 && <PhoneMatchList data={ref.phoneMatches} />}
         {ref.personOffer && ref.offerItem && <OfferItem ref={ref} />}
       </Card>
     </li>
