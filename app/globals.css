@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --header: #364153;
+  --header: #6e4d1d;
   --header-font: #3a1c50;
   --font-color: #9999cc;
   --btn-background: #9197ae;

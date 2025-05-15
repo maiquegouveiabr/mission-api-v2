@@ -28,7 +28,7 @@ function EventItem({ event }: EventItemProps) {
 function EventList({ events }: EventListProps) {
   return (
     <div className="max-w-[650px] m-0">
-      <p className="pb-1 text-sm font-semibold text-gray-500">Events ({events.length})</p>
+      <p className="pb-1 text-sm font-semibold text-[#6e4d1d]">Events ({events.length})</p>
       <div className="flex flex-row gap-2 overflow-x-auto">
         {events.map((event) => (
           <EventItem key={event.eventGuid} event={event} />

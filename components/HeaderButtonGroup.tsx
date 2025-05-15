@@ -15,7 +15,7 @@ function HeaderButtonGroup({ dataLoaded, onLoadData, onSetDateOrder, onThreePlus
     <div className="w-fit flex flex-col gap-1 items-end">
       {!dataLoaded && (
         <Button
-          className="min-w-[80px] p-1 bg-white text-[#364153] font-semibold rounded-sm hover:bg-white hover:text-[#364153] transition-none"
+          className="font-['Poppins',Helvetica] min-w-[80px] p-1 bg-white text-[#6e4d1d] font-semibold rounded-sm hover:bg-white hover:text-[#6e4d1d] transition-none"
           onClick={onLoadData}
           variant="ghost"
         >
@@ -24,7 +24,7 @@ function HeaderButtonGroup({ dataLoaded, onLoadData, onSetDateOrder, onThreePlus
       )}
       {dataLoaded && (
         <Button
-          className="w-fit text-xs p-1 bg-white text-[#364153] font-semibold rounded-sm hover:bg-white hover:text-[#364153] transition-none"
+          className="font-['Poppins',Helvetica] w-fit text-xs p-1 bg-white text-[#6e4d1d] font-semibold rounded-sm hover:bg-white hover:text-[#6e4d1d] transition-none"
           onClick={onNoEventsThreeDays}
           variant="ghost"
         >
@@ -33,7 +33,7 @@ function HeaderButtonGroup({ dataLoaded, onLoadData, onSetDateOrder, onThreePlus
       )}
       {dataLoaded && (
         <Button
-          className="w-fit text-xs p-1 bg-white text-[#364153] font-semibold rounded-sm hover:bg-white hover:text-[#364153] transition-none"
+          className="font-['Poppins',Helvetica] w-fit text-xs p-1 bg-white text-[#6e4d1d] font-semibold rounded-sm hover:bg-white hover:text-[#6e4d1d] transition-none"
           onClick={onThreePlusEvents}
           variant="ghost"
         >
@@ -41,7 +41,7 @@ function HeaderButtonGroup({ dataLoaded, onLoadData, onSetDateOrder, onThreePlus
         </Button>
       )}
       <Button
-        className="w-fit p-1 bg-white text-[#364153] font-semibold rounded-sm hover:bg-white hover:text-[#364153] transition-none"
+        className="font-['Poppins',Helvetica] w-fit p-1 bg-white text-[#6e4d1d] font-semibold rounded-sm hover:bg-white hover:text-[#6e4d1d] transition-none"
         onClick={onSetDateOrder}
         variant="ghost"
       >

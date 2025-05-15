@@ -31,7 +31,7 @@ function DatePicker({ onClear, onDateChange, dataLoaded, value }: DatePickerProp
           }}
         />
         <Button
-          className="rounded-sm font-bold text-[#FFFFFF] bg-[#364153] hover:bg-[#364153] hover:text-[#FFFFFF] p-3 mt-3 transition-none"
+          className="rounded-sm font-bold text-[#FFFFFF] bg-[#6e4d1d] hover:bg-[#6e4d1d] hover:text-[#FFFFFF] p-3 mt-3 transition-none font-['Poppins',Helvetica]"
           onClick={onClear}
           variant="ghost"
         >

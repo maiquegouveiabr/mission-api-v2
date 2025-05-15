@@ -10,10 +10,10 @@ function OfferItem({ ref }: Props) {
     <Card className="max-w-[600px] p-3 m-0">
       <div className="flex flex-col">
         {(ref.personOffer?.pageTitle || ref.offerItem?.headline) && (
-          <p className="text-sm m-0 text-gray-500">{ref.personOffer?.pageTitle ? ref.personOffer?.pageTitle : ref.offerItem?.headline}</p>
+          <p className="text-sm m-0 text-[#6e4d1d]">{ref.personOffer?.pageTitle ? ref.personOffer?.pageTitle : ref.offerItem?.headline}</p>
         )}
-        {ref.offerItem?.adTopic && <p className="text-sm m-0 text-gray-500">{ref.offerItem?.adTopic}</p>}
-        {ref.offerItem?.adText && <p className="text-sm m-0 text-gray-500">{ref.offerItem?.adText}</p>}
+        {ref.offerItem?.adTopic && <p className="text-sm m-0 text-[#6e4d1d]">{ref.offerItem?.adTopic}</p>}
+        {ref.offerItem?.adText && <p className="text-sm m-0 text-[#6e4d1d]">{ref.offerItem?.adText}</p>}
       </div>
     </Card>
   );

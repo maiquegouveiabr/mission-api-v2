@@ -135,30 +135,32 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Save Referral</DialogTitle>
-          <DialogDescription>Fill out the form with the referral's information and hit the save button.</DialogDescription>
+          <DialogTitle className="text-[#6e4d1d] font-['Poppins',Helvetica]">Save Referral</DialogTitle>
+          <DialogDescription className="text-[#6e4d1d] font-['Poppins',Helvetica]">
+            Fill out the form with the referral's information and hit the save button.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-left">
+            <Label htmlFor="name" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Referral Name
             </Label>
             <Input disabled value={ref?.firstName} className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="offer" className="text-left">
+            <Label htmlFor="offer" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Offer
             </Label>
             <Input type="text" value={offer} className="col-span-3" onChange={(event) => setOffer(event.target.value)} />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="who" className="text-left">
+            <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Who Are You
             </Label>
             <Select onChange={handleUserChange} placeholder="Select Missionary" selectLabel="Missionaries" data={memoizedUsers} />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="who" className="text-left">
+            <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Teaching Area
             </Label>
             <Select
@@ -171,7 +173,7 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
           </div>
           {(areaId === 1 || areaId === 2) && (
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="other" className="text-left">
+              <Label htmlFor="other" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
                 {specialAreaLabels[areaId]}
               </Label>
               <Input type="text" value={other} className="col-span-3" onChange={(event) => setOther(event.target.value)} />
@@ -179,7 +181,7 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
           )}
           {areaId === 0 && (
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="who" className="text-left">
+              <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
                 UBA Area
               </Label>
               <Select defaultValue={String(ubaId)} onChange={handleUbaAreaChange} placeholder="Select UBA Area" selectLabel="UBA Area" data={memoizedUba} />
@@ -187,7 +189,7 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
           )}
         </div>
         <DialogFooter>
-          <Button disabled={sending} onClick={handleSend}>
+          <Button className="bg-[#6e4d1d] hover:bg-[#6e4d1d] font-semibold font-['Poppins',Helvetica]" disabled={sending} onClick={handleSend}>
             Save
           </Button>
         </DialogFooter>

@@ -15,16 +15,18 @@ function ReferralItem({ ref, children }: Props) {
     <li>
       <Card className="w-fit p-3">
         <div className="flex flex-col gap-1">
-          <CardTitle className="leading-tight text-gray-700">
+          <CardTitle className="leading-tight text-[#6e4d1d]">
             <a href={`https://referralmanager.churchofjesuschrist.org/person/${ref.personGuid}`} target="_blank" rel="noopener noreferrer">
               {ref.firstName} {ref.lastName ?? ""}
             </a>
           </CardTitle>
-          <CardDescription className="leading-tight">{timestampToDate(new Date(ref.createDate).getTime(), true)}</CardDescription>
-          {ref.contactInfo?.phoneNumbers?.[0]?.number && <CardDescription className="leading-tight">{ref.contactInfo.phoneNumbers[0].number}</CardDescription>}
-          <CardDescription className="leading-tight">{ref.address}</CardDescription>
+          <CardDescription className="leading-tight text-[#6e4d1d]">{timestampToDate(new Date(ref.createDate).getTime(), true)}</CardDescription>
+          {ref.contactInfo?.phoneNumbers?.[0]?.number && (
+            <CardDescription className="leading-tight text-[#6e4d1d]">{ref.contactInfo.phoneNumbers[0].number}</CardDescription>
+          )}
+          <CardDescription className="leading-tight text-[#6e4d1d]">{ref.address}</CardDescription>
           {ref.areaInfo?.proselytingAreas?.[0]?.name && (
-            <CardDescription className="leading-tight font-black">Suggested Area: {ref.areaInfo.proselytingAreas[0].name}</CardDescription>
+            <CardDescription className="leading-tight text-[#6e4d1d] font-black">Suggested Area: {ref.areaInfo.proselytingAreas[0].name}</CardDescription>
           )}
           {ref.contactAttempts && ref.contactAttempts.length > 0 && <EventList events={ref.contactAttempts} />}
         </div>

@@ -8,7 +8,7 @@ interface TitleProps {
 
 export default function Title({ title, containerStyles }: TitleProps) {
   return (
-    <h1 style={containerStyles} className="text-[25px] font-bold text-white">
+    <h1 style={containerStyles} className="text-[25px] font-bold text-white font-['Poppins',Helvetica]">
       {title}
     </h1>
   );

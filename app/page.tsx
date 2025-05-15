@@ -54,11 +54,11 @@ export default () => {
     <div className={styles.container}>
       <div id="form" className="grid gap-5">
         <div className="grid max-w-sm items-center gap-1.5">
-          <Label className="font-['Poppins-SemiBold',Helvetica] font-semibold" htmlFor="username">
+          <Label className="font-['Poppins-SemiBold',Helvetica] text-lg text-white font-semibold" htmlFor="username">
             Username
           </Label>
           <Input
-            className="w-[300px] font-['Poppins',Helvetica] focus-visible:ring-1"
+            className="w-[300px] text-white !placeholder-white font-['Poppins',Helvetica] focus-visible:ring-1 focus-visible:ring-[#95C168]"
             type="text"
             placeholder="Enter Username"
             value={username}
@@ -66,23 +66,23 @@ export default () => {
           />
         </div>
         <div className="grid max-w-sm items-center gap-1.5">
-          <Label className="font-['Poppins-SemiBold',Helvetica] font-semibold" htmlFor="password">
+          <Label className="font-['Poppins-SemiBold',Helvetica] text-lg text-white font-semibold" htmlFor="password">
             Password
           </Label>
           <div className="relative w-full">
             <Input
-              className="w-[300px] font-['Poppins', Helvetica] focus-visible:ring-1 pr-10"
+              className="w-[300px] text-white !placeholder-white font-['Poppins',Helvetica] focus-visible:ring-1 focus-visible:ring-[#95C168]"
               type={show ? "text" : "password"}
               placeholder="Enter Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            {!show && <Eye onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />}
-            {show && <EyeClosed onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />}
+            {!show && <Eye onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#95C168] cursor-pointer" />}
+            {show && <EyeClosed onClick={() => setShow((prev) => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#95C168] cursor-pointer" />}
           </div>
         </div>
         <Button
-          className="w-[300px] cursor-pointer bg-[#14213d] hover:bg-[#14213d] rounded-[3px] text-neutral-200 font-['Poppins-SemiBold',Helvetica] font-semibold text-sm"
+          className="w-[300px] cursor-pointer bg-[#95C168] hover:bg-[#95C168] rounded-[3px] font-['Poppins-SemiBold',Helvetica] font-semibold text-sm"
           disabled={isLoading}
           onClick={handleLogin}
         >
