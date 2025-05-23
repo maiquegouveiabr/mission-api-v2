@@ -182,7 +182,7 @@ export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Pro
                 selectLabel="Offer"
                 data={memoizedOffers}
               />
-              <Input disabled={disabledOffer} type="text" value={offer} onChange={(event) => setOffer(event.target.value)} />
+              {!disabledOffer && <Input type="text" value={offer} onChange={(event) => setOffer(event.target.value)} />}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
