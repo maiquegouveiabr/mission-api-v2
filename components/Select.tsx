@@ -24,7 +24,7 @@ const Item = ({ data, placeholder, selectLabel, defaultValue, onChange }: Props)
 
   return (
     <Select defaultValue={defaultValue} onValueChange={(value) => onChange(Number(value))}>
-      <SelectTrigger>
+      <SelectTrigger className="max-w-[200px]">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="max-h-60 overflow-y-auto">

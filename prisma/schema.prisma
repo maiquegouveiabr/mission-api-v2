@@ -80,3 +80,8 @@ model uba_area {
   id   Int    @id @default(autoincrement())
   name String @unique
 }
+
+model offer {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}

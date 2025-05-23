@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/Select";
-import { Area, Referral, UbaArea, User } from "@/interfaces";
+import { Area, Offer, Referral, UbaArea, User } from "@/interfaces";
 import { useEffect, useMemo, useState } from "react";
 
 const specialAreaLabels: Record<number, string> = {
@@ -13,6 +13,7 @@ const specialAreaLabels: Record<number, string> = {
 };
 
 type Props = {
+  offers: Offer[];
   users: User[];
   areas: Area[];
   uba: UbaArea[];
@@ -22,15 +23,17 @@ type Props = {
   postSent: (ref: Referral, offer: string, areaId: number) => void;
 };
 
-export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
+export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Props) => {
   if (!ref) return null;
 
   const [ubaId, setUbaId] = useState<number | null>(null);
   const [areaId, setAreaId] = useState<number | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [offerId, setOfferId] = useState<number | null>(null);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
   const [sending, setSending] = useState(false);
+  const [disabledOffer, setDisabledOffer] = useState(true);
 
   const memoizedUsers = useMemo(() => {
     return users.map((user) => ({
@@ -53,6 +56,13 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
     }));
   }, [uba]);
 
+  const memoizedOffers = useMemo(() => {
+    return offers.map((offer) => ({
+      id: offer.id,
+      name: offer.name,
+    }));
+  }, [offers]);
+
   const handleAreaChange = (id: number) => {
     setAreaId(id);
   };
@@ -69,10 +79,19 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
     setUserId(id);
   };
 
+  const handleOfferChange = (id: number) => {
+    setOfferId(id);
+  };
+
   const handleSend = async () => {
     try {
-      const frOffer = offer.trim();
+      let frOffer = offer.trim();
       const frOther = other.trim();
+
+      const offerItem = offers.find((item) => item.id === offerId);
+      if (!offerItem) return;
+
+      if (offerItem.id !== 1) frOffer = offerItem.name;
 
       if (areaId == null || userId == null || !frOffer) {
         alert("Please, don't forget any fields!");
@@ -109,7 +128,7 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
         }
         setOpen(false);
         setSending(false);
-        postSent(ref, offer.toUpperCase(), areaId);
+        postSent(ref, frOffer.toUpperCase(), areaId);
       } else {
         throw new Error("An unexpected error occurred.");
       }
@@ -120,6 +139,10 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    setDisabledOffer(offerId === 1 ? false : true);
+  }, [offerId]);
 
   useEffect(() => {
     if (ref.areaInfo && ref.areaInfo.bestProsAreaId) {
@@ -151,7 +174,16 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
             <Label htmlFor="offer" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Offer
             </Label>
-            <Input type="text" value={offer} className="col-span-3" onChange={(event) => setOffer(event.target.value)} />
+            <div className="grid gap-2">
+              <Select
+                {...(offerId != null ? { defaultValue: String(offerId) } : {})}
+                onChange={handleOfferChange}
+                placeholder="Select Offer"
+                selectLabel="Offer"
+                data={memoizedOffers}
+              />
+              <Input disabled={disabledOffer} type="text" value={offer} onChange={(event) => setOffer(event.target.value)} />
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
@@ -164,7 +196,7 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
               Teaching Area
             </Label>
             <Select
-              defaultValue={String(areaId)}
+              {...(areaId != null ? { defaultValue: String(areaId) } : {})}
               onChange={handleAreaChange}
               placeholder="Select Teaching Area"
               selectLabel="Teaching Area"
@@ -184,7 +216,13 @@ export default ({ users, areas, uba, ref, open, setOpen, postSent }: Props) => {
               <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
                 UBA Area
               </Label>
-              <Select defaultValue={String(ubaId)} onChange={handleUbaAreaChange} placeholder="Select UBA Area" selectLabel="UBA Area" data={memoizedUba} />
+              <Select
+                {...(ubaId != null ? { defaultValue: String(ubaId) } : {})}
+                onChange={handleUbaAreaChange}
+                placeholder="Select UBA Area"
+                selectLabel="UBA Area"
+                data={memoizedUba}
+              />
             </div>
           )}
         </div>
