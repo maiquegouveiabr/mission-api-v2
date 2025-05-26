@@ -106,13 +106,10 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
 
       const offerItem = offers.find((item) => item.id === offerId);
       const reasonItem = reasons.find((item) => item.id === reasonId);
-      if (!offerItem || !reasonItem) {
-        alert("Please, don't forget any fields!");
-        return;
-      }
+      if (!offerItem) return;
 
       if (offerItem.id !== 1) frOffer = offerItem.name;
-      if (reasonItem.id !== 1) frOther = reasonItem.name;
+      if (reasonItem && reasonItem.id !== 1) frOther = reasonItem.name;
 
       if (areaId == null || userId == null || !frOffer) {
         alert("Please, don't forget any fields!");
