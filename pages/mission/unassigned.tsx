@@ -24,6 +24,7 @@ import ReferralItem from "@/components/ReferralItem";
 import { useUba } from "@/hooks/useUba";
 import fetchPhoneMatch from "@/util/api/fetchPhoneMatch";
 import { useOffers } from "@/hooks/useOffers";
+import { useStopTeachingReason } from "@/hooks/useStopTeachingReason";
 
 interface UnassignedProps {
   refreshToken: string;
@@ -50,6 +51,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
   const { users, loading } = useUsers(router);
   const { uba, loadingUba } = useUba(router);
   const { offers, loadingOffers } = useOffers(router);
+  const { stopTeachingReasons } = useStopTeachingReason(router);
 
   const handleSetDateOrder = () => {
     setDateState((prev) => !prev);
@@ -320,6 +322,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
           users={users}
           areas={areas}
           offers={offers}
+          reasons={stopTeachingReasons}
           uba={uba}
           open={dialogOpen}
           postSent={handlePostSentReferral}

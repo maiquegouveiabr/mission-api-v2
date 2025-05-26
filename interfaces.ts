@@ -443,3 +443,8 @@ export interface Offer {
   id: number;
   name: string;
 }
+
+export interface StopTeachingReason {
+  id: number;
+  name: string;
+}

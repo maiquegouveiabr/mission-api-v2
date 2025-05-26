@@ -85,3 +85,8 @@ model offer {
   id   Int    @id @default(autoincrement())
   name String @unique
 }
+
+model stop_teaching_reason {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}

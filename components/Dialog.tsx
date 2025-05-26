@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "@/components/Select";
-import { Area, Offer, Referral, UbaArea, User } from "@/interfaces";
+import { Area, Offer, Referral, StopTeachingReason, UbaArea, User } from "@/interfaces";
 import { useEffect, useMemo, useState } from "react";
 
 const specialAreaLabels: Record<number, string> = {
@@ -17,23 +17,26 @@ type Props = {
   users: User[];
   areas: Area[];
   uba: UbaArea[];
+  reasons: StopTeachingReason[];
   ref: Referral | null;
   setOpen: (open: boolean) => void;
   open: boolean;
   postSent: (ref: Referral, offer: string, areaId: number) => void;
 };
 
-export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Props) => {
+export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSent }: Props) => {
   if (!ref) return null;
 
   const [ubaId, setUbaId] = useState<number | null>(null);
   const [areaId, setAreaId] = useState<number | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [offerId, setOfferId] = useState<number | null>(null);
+  const [reasonId, setReasonId] = useState<number | null>(null);
   const [offer, setOffer] = useState("");
   const [other, setOther] = useState("");
   const [sending, setSending] = useState(false);
   const [disabledOffer, setDisabledOffer] = useState(true);
+  const [disabledReason, setDisabledReason] = useState(true);
 
   const memoizedUsers = useMemo(() => {
     return users.map((user) => ({
@@ -63,6 +66,15 @@ export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Pro
     }));
   }, [offers]);
 
+  const memoizedReasons = useMemo(() => {
+    return reasons.map((reason) => {
+      return {
+        id: reason.id,
+        name: reason.name,
+      };
+    });
+  }, [reasons]);
+
   const handleAreaChange = (id: number) => {
     setAreaId(id);
   };
@@ -83,15 +95,24 @@ export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Pro
     setOfferId(id);
   };
 
+  const handleReasonChange = (id: number) => {
+    setReasonId(id);
+  };
+
   const handleSend = async () => {
     try {
       let frOffer = offer.trim();
-      const frOther = other.trim();
+      let frOther = other.trim();
 
       const offerItem = offers.find((item) => item.id === offerId);
-      if (!offerItem) return;
+      const reasonItem = reasons.find((item) => item.id === reasonId);
+      if (!offerItem || !reasonItem) {
+        alert("Please, don't forget any fields!");
+        return;
+      }
 
       if (offerItem.id !== 1) frOffer = offerItem.name;
+      if (reasonItem.id !== 1) frOther = reasonItem.name;
 
       if (areaId == null || userId == null || !frOffer) {
         alert("Please, don't forget any fields!");
@@ -143,6 +164,10 @@ export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Pro
   useEffect(() => {
     setDisabledOffer(offerId === 1 ? false : true);
   }, [offerId]);
+
+  useEffect(() => {
+    setDisabledReason(reasonId === 1 ? false : true);
+  }, [reasonId]);
 
   useEffect(() => {
     if (ref.areaInfo && ref.areaInfo.bestProsAreaId) {
@@ -203,12 +228,29 @@ export default ({ users, areas, offers, uba, ref, open, setOpen, postSent }: Pro
               data={memoizedAreas}
             />
           </div>
-          {(areaId === 1 || areaId === 2) && (
+          {areaId === 1 && (
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="other" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
                 {specialAreaLabels[areaId]}
               </Label>
               <Input type="text" value={other} className="col-span-3" onChange={(event) => setOther(event.target.value)} />
+            </div>
+          )}
+          {areaId === 2 && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
+                Reason To Stop Teaching
+              </Label>
+              <div className="grid gap-2">
+                <Select
+                  {...(ubaId != null ? { defaultValue: String(reasonId) } : {})}
+                  onChange={handleReasonChange}
+                  placeholder="Select Reason To Stop Teaching"
+                  selectLabel="Reason To Stop Teaching"
+                  data={memoizedReasons}
+                />
+                {!disabledReason && <Input type="text" value={other} onChange={(event) => setOther(event.target.value)} />}
+              </div>
             </div>
           )}
           {areaId === 0 && (
