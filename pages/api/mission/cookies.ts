@@ -20,16 +20,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       await page.waitForSelector("#input28", { visible: true });
       await page.type("#input28", String(username));
-      await page.waitForSelector("#form20 > div.o-form-button-bar > input", {
+      await page.waitForSelector("input[type='submit']", {
         visible: true,
       });
-      await page.click("#form20 > div.o-form-button-bar > input");
-      await page.waitForSelector("#input53", { visible: true, timeout: 3000 });
-      await page.type("#input53", String(password));
-      await page.waitForSelector("#form45 > div.o-form-button-bar > input", {
+      await page.click("input[type='submit']");
+      await page.waitForSelector("input.password-with-toggle", { visible: true, timeout: 3000 });
+      await page.type("input.password-with-toggle", String(password));
+      await page.waitForSelector("input[type='submit']", {
         visible: true,
       });
-      await page.click("#form45 > div.o-form-button-bar > input");
+      await page.click("input[type='submit']");
       await page.waitForResponse((response) => response.url().includes("auth") && response.status() === 200);
       const cookies = await page.cookies();
       if (cookies) {
@@ -44,6 +44,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(error);
     res.status(500).json({ message: "An error occurred" });
   } finally {
-    browser.close();
+    if (browser.disconnect) browser.disconnect(); // safer for remote browser connections
   }
 };
