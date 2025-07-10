@@ -40,7 +40,7 @@ export default () => {
         const REFRESH_TOKEN = cookies.find((cookie) => cookie.name === "oauth-abw_refresh_token");
         if (REFRESH_TOKEN) {
           localStorage.setItem("REFRESH_TOKEN", REFRESH_TOKEN.value);
-          router.replace(`/mission/unassigned?refreshToken=${REFRESH_TOKEN?.value}`);
+          router.push(`/mission/unassigned?refreshToken=${REFRESH_TOKEN?.value}`);
         }
       }
     } catch (error) {

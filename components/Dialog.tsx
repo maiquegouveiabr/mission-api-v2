@@ -26,7 +26,8 @@ type Props = {
 
 export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSent }: Props) => {
   if (!ref) return null;
-
+  const MISSION_ID = Number(process.env.NEXT_PUBLIC_MISSION_ID);
+  const UBA_AREA_ID = Number(process.env.NEXT_PUBLIC_UBA_AREA_ID);
   const [ubaId, setUbaId] = useState<number | null>(null);
   const [areaId, setAreaId] = useState<number | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
@@ -38,123 +39,100 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
   const [disabledOffer, setDisabledOffer] = useState(true);
   const [disabledReason, setDisabledReason] = useState(true);
 
-  const memoizedUsers = useMemo(() => {
-    return users.map((user) => ({
-      id: user.user_id,
-      name: user.name,
-    }));
-  }, [users]);
-
-  const memoizedAreas = useMemo(() => {
-    return areas.map((area) => ({
-      id: area.id,
-      name: area.name,
-    }));
-  }, [areas]);
-
-  const memoizedUba = useMemo(() => {
-    return uba.map((uba) => ({
-      id: uba.id,
-      name: uba.name,
-    }));
-  }, [uba]);
-
-  const memoizedOffers = useMemo(() => {
-    return offers.map((offer) => ({
-      id: offer.id,
-      name: offer.name,
-    }));
-  }, [offers]);
-
-  const memoizedReasons = useMemo(() => {
-    return reasons.map((reason) => {
-      return {
-        id: reason.id,
-        name: reason.name,
-      };
-    });
-  }, [reasons]);
-
-  const handleAreaChange = (id: number) => {
-    setAreaId(id);
-  };
-
-  const handleUbaAreaChange = (id: number) => {
-    setUbaId(id);
-    const selectedUba = uba.find((item) => item.id === id);
-    if (selectedUba) {
-      setOther(selectedUba.name);
-    }
-  };
-
-  const handleUserChange = (id: number) => {
-    setUserId(id);
-  };
-
-  const handleOfferChange = (id: number) => {
-    setOfferId(id);
-  };
-
-  const handleReasonChange = (id: number) => {
-    setReasonId(id);
+  const selectData = {
+    users: useMemo(() => users.map(({ user_id, name }) => ({ id: user_id, name })), [users]),
+    areas: useMemo(() => areas.map(({ id, name }) => ({ id, name })), [areas]),
+    uba: useMemo(() => uba.map(({ id, name }) => ({ id, name })), [uba]),
+    offers: useMemo(() => offers.map(({ id, name }) => ({ id, name })), [offers]),
+    reasons: useMemo(() => reasons.map(({ id, name }) => ({ id, name })), [reasons]),
   };
 
   const handleSend = async () => {
     try {
-      let frOffer = offer.trim();
-      let frOther = other.trim();
+      const trimmedOffer = offer.trim();
+      let finalOffer = trimmedOffer;
+      let finalOther = "";
 
       const offerItem = offers.find((item) => item.id === offerId);
-      const reasonItem = reasons.find((item) => item.id === reasonId);
-      if (!offerItem) return;
+      if (!offerItem) {
+        alert("Please select an offer.");
+        return;
+      }
 
-      if (offerItem.id !== 1) frOffer = offerItem.name;
-      if (reasonItem && reasonItem.id !== 1) frOther = reasonItem.name;
+      // Use offer name unless it's "Other"
+      if (offerItem.id !== 1) {
+        finalOffer = offerItem.name;
+      }
 
-      if (areaId == null || userId == null || !frOffer) {
+      // Validate base fields
+      if (!areaId || !userId || !finalOffer) {
         alert("Please, don't forget any fields!");
         return;
       }
 
-      if ((areaId === 0 || areaId === 1 || areaId === 2) && !frOther) {
-        alert("Please, don't forget any fields!");
-        return;
-      }
-
-      const user = users.find((user) => user.user_id === userId);
-      if (user) {
-        setSending(true);
-        const data = {
-          id: ref.personGuid,
-          name: ref.firstName,
-          who_sent: user.name,
-          offer: frOffer,
-          phone: ref.contactInfo?.phoneNumbers?.[0]?.number || "",
-          area_id: areaId,
-          other: frOther,
-        };
-        const response = await fetch("/api/db/references", {
-          method: "POST",
-          body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-          if (response.status === 409) {
-            throw new Error("This referral was sent by someone else!");
-          } else if (response.status === 500) {
-            throw new Error("INTERNAL_SERVER_ERROR");
-          }
+      // Determine finalOther depending on areaId
+      if (areaId === 0) {
+        const ubaArea = uba.find((u) => u.id === ubaId);
+        if (!ubaArea) {
+          alert("Please select a UBA area.");
+          return;
         }
-        setOpen(false);
-        setSending(false);
-        postSent(ref, frOffer.toUpperCase(), areaId);
-      } else {
-        throw new Error("An unexpected error occurred.");
+        finalOther = ubaArea.name;
+      } else if (areaId === 1) {
+        if (!other.trim()) {
+          alert("Please enter the mission name.");
+          return;
+        }
+        finalOther = other.trim();
+      } else if (areaId === 2) {
+        const reasonItem = reasons.find((r) => r.id === reasonId);
+        if (!reasonItem) {
+          alert("Please select a reason to stop teaching.");
+          return;
+        }
+        finalOther = reasonItem.id === 1 ? other.trim() : reasonItem.name;
+
+        if (!finalOther) {
+          alert("Please enter or select a reason to stop teaching.");
+          return;
+        }
       }
-    } catch (error) {
-      alert(error);
+
+      const user = users.find((u) => u.user_id === userId);
+      if (!user) {
+        alert("Please select a missionary.");
+        return;
+      }
+
+      setSending(true);
+
+      const payload = {
+        id: ref.personGuid,
+        name: ref.firstName,
+        who_sent: user.name,
+        offer: finalOffer,
+        phone: ref.contactInfo?.phoneNumbers?.[0]?.number || "",
+        area_id: areaId,
+        other: finalOther,
+      };
+
+      const response = await fetch("/api/db/references", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        if (response.status === 409) throw new Error("This referral was sent by someone else!");
+        throw new Error("INTERNAL_SERVER_ERROR");
+      }
+
+      postSent(ref, finalOffer.toUpperCase(), areaId);
       setOpen(false);
-      setSending(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Something went wrong");
       console.error(error);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -168,13 +146,13 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
 
   useEffect(() => {
     if (ref.areaInfo && ref.areaInfo.bestProsAreaId) {
-      if (ref.areaInfo.missions && ref.areaInfo.missions[0].id !== 14319) {
+      if (ref.areaInfo.missions && ref.areaInfo.missions[0].id !== MISSION_ID) {
         setAreaId(1);
         setOther(ref.areaInfo.missions[0].name);
-      } else if (ref.areaInfo.bestProsAreaId === 500625799) setAreaId(0);
+      } else if (ref.areaInfo.bestProsAreaId === UBA_AREA_ID) setAreaId(0);
       else setAreaId(ref.areaInfo.bestProsAreaId);
     }
-  }, []);
+  }, [ref]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -199,10 +177,10 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
             <div className="grid gap-2">
               <Select
                 {...(offerId != null ? { defaultValue: String(offerId) } : {})}
-                onChange={handleOfferChange}
+                onChange={setOfferId}
                 placeholder="Select Offer"
                 selectLabel="Offer"
-                data={memoizedOffers}
+                data={selectData.offers}
               />
               {!disabledOffer && <Input type="text" value={offer} onChange={(event) => setOffer(event.target.value)} />}
             </div>
@@ -211,7 +189,13 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
             <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
               Who Are You
             </Label>
-            <Select onChange={handleUserChange} placeholder="Select Missionary" selectLabel="Missionaries" data={memoizedUsers} />
+            <Select
+              {...(userId != null ? { defaultValue: String(userId) } : {})}
+              onChange={setUserId}
+              placeholder="Select Missionary"
+              selectLabel="Missionaries"
+              data={selectData.users}
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="who" className="text-left text-[#6e4d1d] font-['Poppins',Helvetica]">
@@ -219,10 +203,10 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
             </Label>
             <Select
               {...(areaId != null ? { defaultValue: String(areaId) } : {})}
-              onChange={handleAreaChange}
+              onChange={setAreaId}
               placeholder="Select Teaching Area"
               selectLabel="Teaching Area"
-              data={memoizedAreas}
+              data={selectData.areas}
             />
           </div>
           {areaId === 1 && (
@@ -241,10 +225,10 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
               <div className="grid gap-2">
                 <Select
                   {...(ubaId != null ? { defaultValue: String(reasonId) } : {})}
-                  onChange={handleReasonChange}
+                  onChange={setReasonId}
                   placeholder="Select Reason To Stop Teaching"
                   selectLabel="Reason To Stop Teaching"
-                  data={memoizedReasons}
+                  data={selectData.reasons}
                 />
                 {!disabledReason && <Input type="text" value={other} onChange={(event) => setOther(event.target.value)} />}
               </div>
@@ -257,10 +241,10 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
               </Label>
               <Select
                 {...(ubaId != null ? { defaultValue: String(ubaId) } : {})}
-                onChange={handleUbaAreaChange}
+                onChange={setUbaId}
                 placeholder="Select UBA Area"
                 selectLabel="UBA Area"
-                data={memoizedUba}
+                data={selectData.uba}
               />
             </div>
           )}

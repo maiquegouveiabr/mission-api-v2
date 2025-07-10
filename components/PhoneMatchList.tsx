@@ -27,7 +27,7 @@ function PhoneMatchList({ data }: Props) {
       <div className="flex flex-col gap-1">
         <CardDescription className="leading-tight font-black">Possible Matches</CardDescription>
         {data.map((item) => (
-          <PhoneItem id={item.id} phone={item.phone} name={item.name} />
+          <PhoneItem key={item.id} id={item.id} phone={item.phone} name={item.name} />
         ))}
       </div>
     </Card>

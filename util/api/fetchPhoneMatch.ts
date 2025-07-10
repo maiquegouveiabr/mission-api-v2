@@ -6,7 +6,8 @@ type Props = {
 
 export default async (phone: string): Promise<Props[] | []> => {
   try {
-    const response = await fetch(`/api/db/phoneMatch?phone=${phone}`);
+    const url = `/api/db/phoneMatch?phone=${phone}`;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(response.statusText);
     }

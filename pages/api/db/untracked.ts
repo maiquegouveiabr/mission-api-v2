@@ -3,6 +3,7 @@ import { prisma } from "@/util/db";
 import fetchData from "@/util/api/fetchData";
 import { Referral } from "@/interfaces";
 
+const SERVICO = 500622165;
 const BOA_VISTA_COLOMBO = 500387154;
 const PONTA_GROSSA_CAMPOS_GERAIS = 500427238;
 const TARUMÃ_PINHAIS = 500427239;
@@ -19,7 +20,8 @@ const checkValidZone = function (zoneId: number) {
     zoneId === IGUAÇU_CAMPO_COMPRIDO ||
     zoneId === SÃO_LOURENÇO_CURITIBA ||
     zoneId === PONTA_GROSSA_NORTE ||
-    zoneId === APS
+    zoneId === APS ||
+    zoneId === SERVICO
   );
 };
 
@@ -62,7 +64,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return {
         id: ref.personGuid,
         name: ref.lastName ? `${ref.firstName} ${ref.lastName}` : `${ref.firstName}`,
-        area_id: checkValidZone(ref.zoneId) ? (ref.areaId === 500625799 ? 0 : ref.areaId) : 1,
+        area_id: checkValidZone(ref.zoneId) ? (ref.areaId === 500622167 ? 0 : ref.areaId) : 1,
         who_sent: "Python",
       };
     });
