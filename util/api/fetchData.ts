@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (url: string, refreshToken: string) => {
   const requestOptions: RequestInit = {
     method: "GET",

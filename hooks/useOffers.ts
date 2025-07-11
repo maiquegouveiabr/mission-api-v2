@@ -30,7 +30,7 @@ export function useOffers(router: AppRouterInstance) {
       alert(error);
       router.refresh();
     }
-  }, [error]);
+  }, [error, router]);
 
   return { offers, error, fetchOffers, loadingOffers };
 }

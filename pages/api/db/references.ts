@@ -12,8 +12,7 @@ interface ReferenceData {
   phone: string | null;
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function (req: NextApiRequest, res: NextApiResponse) {
   const data: ReferenceData = JSON.parse(req.body);
   if (!data) {
     res.status(400).json({
@@ -44,4 +43,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
     }
   }
-};
+}

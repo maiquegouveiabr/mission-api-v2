@@ -2,7 +2,7 @@ import { OfferItem, PersonOffer } from "@/interfaces";
 import fetchData from "@/util/api/fetchData";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function (req: NextApiRequest, res: NextApiResponse) {
   try {
     const { refreshToken, id } = req.query;
 
@@ -38,4 +38,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       message: "An unexpected error occured.",
     });
   }
-};
+}

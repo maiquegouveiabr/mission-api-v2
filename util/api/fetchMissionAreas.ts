@@ -1,7 +1,6 @@
 import fetchData from "./fetchData";
 import { District, ProsArea, Zone } from "@/interfaces";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (refreshToken: string): Promise<{ zone: Zone; areas: ProsArea[] }[]> => {
   const missionId = process.env.NEXT_PUBLIC_MISSION_ID;
   const url = `https://referralmanager.churchofjesuschrist.org/services/mission/${missionId}`;

@@ -30,7 +30,7 @@ export function useStopTeachingReason(router: AppRouterInstance) {
       alert(error);
       router.refresh();
     }
-  }, [error]);
+  }, [error, router]);
 
   return { stopTeachingReasons, error, fetchUseStopTeachingReason, loadingStopTeachingReasons };
 }

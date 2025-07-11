@@ -4,9 +4,8 @@ export function useIds() {
   const [ids, setIds] = useState<string[]>([]);
 
   const fetchIds = async () => {
-    const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
     try {
-      const response = await fetch(`${API_URL}/api/db/ids`);
+      const response = await fetch(`/api/db/ids`);
       if (!response.ok) {
         throw new Error(response.statusText);
       }

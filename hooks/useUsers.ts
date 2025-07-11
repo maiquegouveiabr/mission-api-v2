@@ -8,10 +8,9 @@ export function useUsers(router: AppRouterInstance) {
   const [loading, setLoading] = useState(false);
 
   const fetchUsers = async () => {
-    const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/db/users`);
+      const response = await fetch(`/api/db/users`);
       if (!response.ok) throw new Error(response.statusText);
       const data = await response.json();
       setUsers(data);
@@ -31,7 +30,7 @@ export function useUsers(router: AppRouterInstance) {
       alert(error);
       router.refresh();
     }
-  }, [error]);
+  }, [error, router]);
 
   return { users, error, fetchUsers, loading };
 }

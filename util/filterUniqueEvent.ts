@@ -1,6 +1,5 @@
 import { ContactAttempt } from "@/interfaces";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default (events: ContactAttempt[]) => {
   const eventDays = new Set();
   return events.filter(({ itemDate }) => {

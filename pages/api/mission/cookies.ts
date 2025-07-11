@@ -4,7 +4,6 @@ import puppeteer from "puppeteer";
 // oauth-abw_refresh_token
 // oauth-abw_church_account_id
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const BROWSERLESS_API = process.env.BROWSERLESS_API;
   const { username } = req.body;

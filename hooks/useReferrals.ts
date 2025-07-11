@@ -1,6 +1,6 @@
 import { Referral } from "@/interfaces";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function useReferrals(refreshToken: string, router: AppRouterInstance) {
   const [referrals, setReferrals] = useState<Referral[]>([]);
@@ -8,13 +8,11 @@ export default function useReferrals(refreshToken: string, router: AppRouterInst
   const [loadingReferrals, setLoadingReferrals] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReferrals = async () => {
+  const fetchReferrals = useCallback(async () => {
     setLoadingReferrals(true);
     setError(null); // Reset errors before fetching
     try {
-      const isDev = process.env.NODE_ENV === "development";
-      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-      const response = await fetch(`${url}/api/referrals/unassigned?refreshToken=${refreshToken}`);
+      const response = await fetch(`/api/referrals/unassigned?refreshToken=${refreshToken}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch referrals");
@@ -41,18 +39,18 @@ export default function useReferrals(refreshToken: string, router: AppRouterInst
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     }
-  };
+  }, [refreshToken]);
 
   useEffect(() => {
     fetchReferrals();
-  }, []);
+  }, [fetchReferrals]);
 
   useEffect(() => {
     if (error) {
       alert(error);
       router.replace("/");
     }
-  }, [error]);
+  }, [error, router]);
 
   return { referrals, setReferrals, filteredReferrals, setFilteredReferrals, loadingReferrals, error, fetchReferrals };
 }

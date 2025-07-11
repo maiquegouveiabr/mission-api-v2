@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-anonymous-default-export
 export default (timestamp: number, timeIncluded: boolean) => {
   const date = new Date(timestamp);
   const day = `${date.getDate()}`.padStart(2, "0");

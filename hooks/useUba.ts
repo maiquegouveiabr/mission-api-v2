@@ -30,7 +30,7 @@ export function useUba(router: AppRouterInstance) {
       alert(error);
       router.refresh();
     }
-  }, [error]);
+  }, [error, router]);
 
   return { uba, error, fetchUba, loadingUba };
 }

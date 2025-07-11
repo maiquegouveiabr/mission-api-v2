@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetchMissionArea from "@/util/api/fetchMissionAreas";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { refreshToken } = req.query;
   const zones = await fetchMissionArea(String(refreshToken));

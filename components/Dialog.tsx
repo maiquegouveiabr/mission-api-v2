@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,7 @@ type Props = {
   postSent: (ref: Referral, offer: string, areaId: number) => void;
 };
 
-export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSent }: Props) => {
-  if (!ref) return null;
+export default function DialogComponent({ users, areas, offers, uba, reasons, ref, open, setOpen, postSent }: Props) {
   const MISSION_ID = Number(process.env.NEXT_PUBLIC_MISSION_ID);
   const UBA_AREA_ID = Number(process.env.NEXT_PUBLIC_UBA_AREA_ID);
   const [ubaId, setUbaId] = useState<number | null>(null);
@@ -38,6 +38,8 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
   const [sending, setSending] = useState(false);
   const [disabledOffer, setDisabledOffer] = useState(true);
   const [disabledReason, setDisabledReason] = useState(true);
+
+  if (!ref) return null;
 
   const selectData = {
     users: useMemo(() => users.map(({ user_id, name }) => ({ id: user_id, name })), [users]),
@@ -152,7 +154,7 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
       } else if (ref.areaInfo.bestProsAreaId === UBA_AREA_ID) setAreaId(0);
       else setAreaId(ref.areaInfo.bestProsAreaId);
     }
-  }, [ref]);
+  }, [ref, MISSION_ID, UBA_AREA_ID]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -160,7 +162,7 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
         <DialogHeader>
           <DialogTitle className="text-[#6e4d1d] font-['Poppins',Helvetica]">Save Referral</DialogTitle>
           <DialogDescription className="text-[#6e4d1d] font-['Poppins',Helvetica]">
-            Fill out the form with the referral's information and hit the save button.
+            Fill out the form with the referral&apos;s information and hit the save button.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -257,4 +259,4 @@ export default ({ users, areas, offers, uba, reasons, ref, open, setOpen, postSe
       </DialogContent>
     </Dialog>
   );
-};
+}

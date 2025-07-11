@@ -11,9 +11,7 @@ export function useAreas(router: AppRouterInstance) {
     setAreasLoading(true);
     setError(null); // Reset errors before fetching
     try {
-      const isDev = process.env.NODE_ENV === "development";
-      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
-      const response = await fetch(`${url}/api/db/areas`);
+      const response = await fetch(`/api/db/areas`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch areas from database");
@@ -37,7 +35,7 @@ export function useAreas(router: AppRouterInstance) {
       alert(error);
       router.refresh();
     }
-  }, [error]);
+  }, [error, router]);
 
   return { areas, areasLoading, error, fetchAreas };
 }

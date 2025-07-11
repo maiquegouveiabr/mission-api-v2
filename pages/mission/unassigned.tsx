@@ -1,7 +1,7 @@
 import "@/app/globals.css";
 import { Referral, TitleOption } from "@/interfaces";
 import Title from "@/components/Title";
-import { CSSProperties, useMemo, useState } from "react";
+import { CSSProperties, useCallback, useMemo, useState } from "react";
 import styles from "./unassigned.module.css";
 import timestampToDate from "@/util/timestampToDate";
 import checkTimestamp3DaysOld from "@/util/checkTimestamp3DaysOld";
@@ -99,8 +99,6 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
 
   const handleLoadData = async () => {
     try {
-      const isDev = process.env.NODE_ENV === "development";
-      const url = isDev ? "http://localhost:3000" : "https://mission-api-v2.vercel.app";
       const refreshToken = localStorage.getItem("REFRESH_TOKEN");
       if (!refreshToken) throw new Error("No refresh token found.");
 
@@ -111,10 +109,10 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
       };
 
       // Fetch area info with retries
-      const referralsCompleteWithArea = await fetchWithRetry(`${url}/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, options);
+      const referralsCompleteWithArea = await fetchWithRetry(`/api/referrals/areaInfoApi?refreshToken=${refreshToken}`, options);
 
       // Fetch referral attempts with retries
-      const referralsWithAttempts = await fetchWithRetry(`${url}/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
+      const referralsWithAttempts = await fetchWithRetry(`/api/referrals/referralAttemptApi?refreshToken=${refreshToken}`, {
         ...options,
         body: JSON.stringify(referralsCompleteWithArea),
       });
@@ -128,116 +126,130 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     }
   };
 
-  const handleLoadPhone = async (referral: Referral) => {
-    try {
-      const refreshToken = localStorage.getItem("REFRESH_TOKEN");
+  const handleLoadPhone = useCallback(
+    async (referral: Referral) => {
+      try {
+        const refreshToken = localStorage.getItem("REFRESH_TOKEN");
 
-      if (!refreshToken) throw new Error("No refresh token found.");
+        if (!refreshToken) throw new Error("No refresh token found.");
 
-      // Fetch referral info
-      const response = await fetch(`/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
-        method: "POST",
+        // Fetch referral info
+        const response = await fetch(`/api/referrals/referralInfoApi?refreshToken=${refreshToken}`, {
+          method: "POST",
 
-        body: JSON.stringify(referral),
-      });
+          body: JSON.stringify(referral),
+        });
 
-      if (!response.ok) throw new Error(`Failed to fetch referral info: ${response.statusText}`);
+        if (!response.ok) throw new Error(`Failed to fetch referral info: ${response.statusText}`);
 
-      const data = await response.json();
-      const phoneMatches = await fetchPhoneMatch(data.contactInfo.phoneNumbers?.[0]?.number);
-      const newData = {
-        ...data,
-        phoneMatches,
-      };
-      // Efficiently update state using map()
-      setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? newData : ref)));
-    } catch (error) {
-      console.error("Error loading referral info:", error);
-      alert("Failed to load referral info. Please try again.");
-    }
-  };
+        const data = await response.json();
+        const phoneMatches = await fetchPhoneMatch(data.contactInfo.phoneNumbers?.[0]?.number);
+        const newData = {
+          ...data,
+          phoneMatches,
+        };
+        // Efficiently update state using map()
+        setReferrals((prev) => prev.map((ref) => (ref.personGuid === referral.personGuid ? newData : ref)));
+      } catch (error) {
+        console.error("Error loading referral info:", error);
+        alert("Failed to load referral info. Please try again.");
+      }
+    },
+    [setReferrals]
+  );
 
   const handleTwoPlusEvents = () => {
     setActiveFilter(FILTERS.TWO_PLUS);
     setDate(null);
   };
+  const handlePostSentReferral = useCallback(
+    (referral: Referral, offer?: string, areaId?: number) => {
+      // Find the area once
+      const updatedAreaName = areas?.find((area) => area.id === areaId)?.name || "";
 
-  const handleOpenDialog = async (referral: Referral) => {
-    try {
-      const response = await fetch(`/api/db/referralExist?id=${referral.personGuid}`);
-      if (!response.ok) throw new Error(`${response.statusText}`);
-      const { exist, who_sent } = await response.json();
-      if (exist) {
-        handlePostSentReferral(referral);
-        alert(`${who_sent} sent this referral already!`);
-        return;
+      // Function to update a referral
+      const updateReferral = (item: Referral) =>
+        item.personGuid === referral.personGuid ? { ...item, sentStatus: true, offerText: offer, areaName: updatedAreaName } : item;
+
+      // Update state efficiently
+      setReferrals((prev) => prev.map(updateReferral));
+      setDialogOpen(false);
+    },
+    [areas, setReferrals]
+  );
+
+  const handleOpenDialog = useCallback(
+    async (referral: Referral) => {
+      try {
+        const response = await fetch(`/api/db/referralExist?id=${referral.personGuid}`);
+        if (!response.ok) throw new Error(`${response.statusText}`);
+        const { exist, who_sent } = await response.json();
+        if (exist) {
+          handlePostSentReferral(referral);
+          alert(`${who_sent} sent this referral already!`);
+          return;
+        }
+        setCurrentReferral(referral);
+        setDialogOpen(true);
+      } catch (error) {
+        console.error(error);
+        alert(error);
       }
-      setCurrentReferral(referral);
-      setDialogOpen(true);
-    } catch (error) {
-      console.error(error);
-      alert(error);
-    }
-  };
+    },
+    [handlePostSentReferral]
+  );
 
   const handleNoEventsThreeDays = () => {
     setActiveFilter(FILTERS.NO_EVENTS_THREE_DAYS);
     setDate(null);
   };
 
-  const handlePostSentReferral = (referral: Referral, offer?: string, areaId?: number) => {
-    // Find the area once
-    const updatedAreaName = areas?.find((area) => area.id === areaId)?.name || "";
-
-    // Function to update a referral
-    const updateReferral = (item: Referral) =>
-      item.personGuid === referral.personGuid ? { ...item, sentStatus: true, offerText: offer, areaName: updatedAreaName } : item;
-
-    // Update state efficiently
-    setReferrals((prev) => prev.map(updateReferral));
-    setDialogOpen(false);
-  };
-
-  const handleDelete = (referral: Referral) => {
-    setReferrals(referrals.filter((ref) => ref.personGuid !== referral.personGuid));
-  };
+  const handleDelete = useCallback(
+    (referral: Referral) => {
+      setReferrals(referrals.filter((ref) => ref.personGuid !== referral.personGuid));
+    },
+    [referrals, setReferrals]
+  );
 
   const handleDateChange = (newValue: Dayjs | null) => {
     setDate(newValue);
     setActiveFilter(FILTERS.DATE_FILTER);
   };
 
-  const handleLoadOffer = async (ref: Referral) => {
-    if (!ref.personOffer && !ref.offerItem) {
-      try {
-        const response = await fetch(`/api/referrals/offer?id=${ref.personGuid}&refreshToken=${refreshToken}`);
+  const handleLoadOffer = useCallback(
+    async (ref: Referral) => {
+      if (!ref.personOffer && !ref.offerItem) {
+        try {
+          const response = await fetch(`/api/referrals/offer?id=${ref.personGuid}&refreshToken=${refreshToken}`);
 
-        if (!response.ok) {
-          const { error, message } = await response.json();
-          alert(message);
-          return;
-        } else {
-          const { offerItem, personOffer } = await response.json();
-          const newRef = {
-            ...ref,
-            offerItem,
-            personOffer,
-          };
-          const copyUnassigned = [...referrals];
+          if (!response.ok) {
+            const { error, message } = await response.json();
+            alert(message);
+            return;
+          } else {
+            const { offerItem, personOffer } = await response.json();
+            const newRef = {
+              ...ref,
+              offerItem,
+              personOffer,
+            };
+            const copyUnassigned = [...referrals];
 
-          const index = copyUnassigned.findIndex((r) => r.personGuid === ref.personGuid);
-          if (index !== -1) {
-            copyUnassigned[index] = newRef;
+            const index = copyUnassigned.findIndex((r) => r.personGuid === ref.personGuid);
+            if (index !== -1) {
+              copyUnassigned[index] = newRef;
+            }
+
+            setReferrals(copyUnassigned);
+            setOpenOfferReferral(ref.personGuid);
           }
-
-          setReferrals(copyUnassigned);
-          setOpenOfferReferral(ref.personGuid);
-        }
-      } catch (error) {}
-    } else {
-      setOpenOfferReferral(openOfferReferral === ref.personGuid ? "" : ref.personGuid);
-    }
-  };
+        } catch (error) {}
+      } else {
+        setOpenOfferReferral(openOfferReferral === ref.personGuid ? "" : ref.personGuid);
+      }
+    },
+    [openOfferReferral, referrals, refreshToken, setReferrals]
+  );
 
   const handleClearDateFilter = () => {
     setActiveFilter(0);
@@ -301,7 +313,7 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
         </div>
       </ReferralItem>
     ));
-  }, [filtered, dataLoaded, openOfferReferral]);
+  }, [filtered, dataLoaded, handleDelete, handleLoadOffer, handleLoadPhone, handleOpenDialog]);
 
   const title = useMemo(() => {
     return `${Object.values(TitleOption)[activeFilter]} (${filtered.length})`;

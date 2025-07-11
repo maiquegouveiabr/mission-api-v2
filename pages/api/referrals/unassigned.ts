@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import fetchReferrals from "@/util/api/fetchReferrals";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { refreshToken } = req.query;
   const referrals = await fetchReferrals(String(refreshToken));

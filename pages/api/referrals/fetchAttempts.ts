@@ -3,7 +3,6 @@ import fetchData from "@/util/api/fetchData";
 import filterUniqueEvent from "@/util/filterUniqueEvent";
 import { NextApiRequest, NextApiResponse } from "next";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const unassigned: Referral[] = req.body;
   const { refreshToken } = req.query;
@@ -18,8 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       if (latestNewReferral) {
         const filteredAttempts = filterUniqueEvent(
           contactAttempts.filter(
-            ({ itemDate, timelineItemType }) =>
-              itemDate > latestNewReferral.itemDate && (timelineItemType === "CONTACT" || timelineItemType === "TEACHING")
+            ({ itemDate, timelineItemType }) => itemDate > latestNewReferral.itemDate && (timelineItemType === "CONTACT" || timelineItemType === "TEACHING")
           ) || []
         );
         return {

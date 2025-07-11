@@ -2,7 +2,6 @@ import { ContactAttempt, Referral } from "@/interfaces";
 import fetchData from "./fetchData";
 import filterUniqueEvent from "../filterUniqueEvent";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (referrals: Referral[], refreshToken: string) => {
   return Promise.all(
     referrals.map(async (ref) => {

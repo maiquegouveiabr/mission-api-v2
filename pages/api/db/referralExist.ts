@@ -1,7 +1,6 @@
 import { NextApiResponse, NextApiRequest } from "next";
 import { prisma } from "@/util/db";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { id: referralId } = req.query;
