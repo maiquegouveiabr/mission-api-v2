@@ -67,7 +67,8 @@ export default function DialogComponent({ users, areas, offers, uba, reasons, re
       }
 
       // Validate base fields
-      if (!areaId || !userId || !finalOffer) {
+      if (areaId === null || !userId || !finalOffer) {
+        console.log(areaId, userId, finalOffer);
         alert("Please, don't forget any fields!");
         return;
       }
