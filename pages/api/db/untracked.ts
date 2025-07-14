@@ -33,12 +33,12 @@ function isTimestampAfterReference(reference: string, timestamp: number | string
 }
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  const MISSION_ID = Number(process.env.NEXT_PUBLIC_MISSION_ID);
+  const UBA_AREA_ID = Number(process.env.NEXT_PUBLIC_UBA_AREA_ID);
+  const url = `https://referralmanager.churchofjesuschrist.org/services/people/mission/${MISSION_ID}?includeDroppedPersons=true`;
   const { refreshToken, date, save } = req.query;
 
-  const data = await fetchData(
-    "https://referralmanager.churchofjesuschrist.org/services/people/mission/14319?includeDroppedPersons=true",
-    String(refreshToken)
-  );
+  const data = await fetchData(url, String(refreshToken));
   const rawReferrals: Referral[] = data.persons;
 
   if (!refreshToken) {
@@ -64,7 +64,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return {
         id: ref.personGuid,
         name: ref.lastName ? `${ref.firstName} ${ref.lastName}` : `${ref.firstName}`,
-        area_id: checkValidZone(ref.zoneId) ? (ref.areaId === 500622167 ? 0 : ref.areaId) : 1,
+        area_id: checkValidZone(ref.zoneId) ? (ref.areaId === UBA_AREA_ID ? 0 : ref.areaId) : 1,
         who_sent: "Python",
       };
     });
