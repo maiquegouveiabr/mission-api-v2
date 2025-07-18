@@ -22,7 +22,7 @@ type Props = {
   ref: Referral | null;
   setOpen: (open: boolean) => void;
   open: boolean;
-  postSent: (ref: Referral, offer: string, areaId: number) => void;
+  postSent: (ref: Referral, offer: string, areaName: string) => void;
 };
 
 export default function DialogComponent({ users, areas, offers, uba, reasons, ref, open, setOpen, postSent }: Props) {
@@ -68,7 +68,6 @@ export default function DialogComponent({ users, areas, offers, uba, reasons, re
 
       // Validate base fields
       if (areaId === null || !userId || !finalOffer) {
-        console.log(areaId, userId, finalOffer);
         alert("Please, don't forget any fields!");
         return;
       }
@@ -128,8 +127,16 @@ export default function DialogComponent({ users, areas, offers, uba, reasons, re
         if (response.status === 409) throw new Error("This referral was sent by someone else!");
         throw new Error("INTERNAL_SERVER_ERROR");
       }
+      let areaName = "";
+      if (areaId === 0) {
+        const ubaName = uba?.find((area) => area.id === ubaId)?.name || "";
+        areaName = ubaName;
+      } else {
+        const name = areas?.find((area) => area.id === areaId)?.name || "";
+        areaName = name;
+      }
 
-      postSent(ref, finalOffer.toUpperCase(), areaId);
+      postSent(ref, finalOffer.toUpperCase(), areaName);
       setOpen(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Something went wrong");

@@ -236,7 +236,7 @@ export interface ReferralComplete {
 export interface Mission {
   id: number;
   name: string;
-  children: any | null;
+  children: unknown | null;
   leadership: Leadership[];
   cdolId: number;
   orgId: number;
@@ -270,7 +270,7 @@ export interface Leadership {
 export interface Organization {
   id: number;
   name: string;
-  children: any | null;
+  children: unknown | null;
   type: string;
   subType: string;
   mapLayerUnitType: string;
@@ -325,7 +325,7 @@ export interface AreaInfo {
   countryExtentThresholdMeters: number;
   prosAreasWithinExtent: ProsArea | null;
   formattedAddress: string | null;
-  areaIdRejectionReasons: any | null;
+  areaIdRejectionReasons: unknown | null;
   isBestWardLanguageMatch: boolean;
 }
 
@@ -406,15 +406,8 @@ export enum TitleOption {
   OPTION_2 = "UBA",
   OPTION_3 = "TWO+ ATTMP",
   OPTION_4 = "THREE DAYS+ NO ATTMP",
-  OPTION_5 = "UNASSIGNED REFERRALS",
+  OPTION_5 = TitleOption.OPTION_1,
   OPTION_6 = "YESTERDAY'S",
-}
-
-export enum WindowSettings {
-  // LOGIN_WINDOW = "Welcome to Berk",
-  // UNASSIGNED_WINDOW = "This is toothless",
-  LOGIN_WINDOW = "Referral Manager Plus",
-  UNASSIGNED_WINDOW = "Referral Manager Plus",
 }
 
 enum ZoneEnum {

@@ -162,20 +162,18 @@ export default function Unassigned({ refreshToken }: UnassignedProps) {
     setActiveFilter(FILTERS.TWO_PLUS);
     setDate(null);
   };
-  const handlePostSentReferral = useCallback(
-    (referral: Referral, offer?: string, areaId?: number) => {
-      // Find the area once
-      const updatedAreaName = areas?.find((area) => area.id === areaId)?.name || "";
 
+  const handlePostSentReferral = useCallback(
+    (referral: Referral, offer?: string, areaName?: string) => {
       // Function to update a referral
       const updateReferral = (item: Referral) =>
-        item.personGuid === referral.personGuid ? { ...item, sentStatus: true, offerText: offer, areaName: updatedAreaName } : item;
+        item.personGuid === referral.personGuid ? { ...item, sentStatus: true, offerText: offer, areaName: areaName || "" } : item;
 
       // Update state efficiently
       setReferrals((prev) => prev.map(updateReferral));
       setDialogOpen(false);
     },
-    [areas, setReferrals]
+    [setReferrals]
   );
 
   const handleOpenDialog = useCallback(
