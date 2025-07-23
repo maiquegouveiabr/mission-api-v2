@@ -1,7 +1,6 @@
-import { NextApiResponse, NextApiRequest } from "next";
 import { prisma } from "@/util/db";
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function getAreas() {
   try {
     const areas = await prisma.area.findMany({
       where: {
@@ -11,9 +10,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         name: "asc",
       },
     });
-    res.status(200).send(areas);
+    return areas;
   } catch (error) {
     console.error(error);
-    res.status(400).send(error);
+    return [];
   }
 }

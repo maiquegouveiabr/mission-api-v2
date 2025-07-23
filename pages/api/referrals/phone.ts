@@ -1,6 +1,12 @@
-import { Referral } from "@/interfaces";
-import fetchReferralsInfo from "@/util/api/fetchReferralsInfo";
+import { Referral, ReferralComplete } from "@/interfaces";
+import fetchData from "@/util/api/fetchData";
 import { NextApiRequest, NextApiResponse } from "next";
+
+const fetchPhone = async (urls: string[], refreshToken: string): Promise<ReferralComplete[] | []> => {
+  const data = await Promise.all(urls.map((url) => fetchData(url, refreshToken)));
+  if (!data) return [];
+  return data;
+};
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { refreshToken } = req.query;
@@ -11,10 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       message: "refreshToken was not provided.",
     });
   } else {
-    const referralInfo = await fetchReferralsInfo(
-      [`https://referralmanager.churchofjesuschrist.org/services/people/${referral.personGuid}`],
-      String(refreshToken)
-    );
+    const referralInfo = await fetchPhone([`https://referralmanager.churchofjesuschrist.org/services/people/${referral.personGuid}`], String(refreshToken));
     if (referralInfo[0]) {
       res.send({
         ...referral,

@@ -8,11 +8,11 @@ import { Button } from "./ui/button";
 interface DatePickerProps {
   onClear: () => void;
   onDateChange: (date: Dayjs | null) => void;
-  dataLoaded: boolean;
+
   value: Dayjs | null;
 }
 
-function DatePicker({ onClear, onDateChange, dataLoaded, value }: DatePickerProps) {
+function DatePicker({ onClear, onDateChange, value }: DatePickerProps) {
   const handleDateChange = (newValue: Dayjs | null) => {
     onDateChange(newValue);
   };
@@ -21,7 +21,6 @@ function DatePicker({ onClear, onDateChange, dataLoaded, value }: DatePickerProp
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div className={styles.picker_container}>
         <Picker
-          disabled={!dataLoaded}
           value={value}
           onChange={handleDateChange}
           label="Filter by date"

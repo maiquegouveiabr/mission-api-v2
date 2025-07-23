@@ -25,16 +25,6 @@
   font-weight: bold;
 }
 
-.container {
-  background-image: url("../../img/home.png");
-  background-size: auto;
-  background-position: 100%;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  padding-top: 140px;
-}
-
 .headerBtn {
   background-color: #faf0ca;
   color: red;
@@ -43,8 +33,8 @@
 .headerButton {
   background-color: "#FAF0CA";
   color: "#3a1c50";
-  font-weight: "bold";
-  font-family: "Verdana";
+  font-weight: bold;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 @media (max-width: 768px) {

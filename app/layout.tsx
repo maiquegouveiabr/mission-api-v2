@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Referral Manager | Sign In",
+  title: "Referral Manager",
   description: "Created by Elder Gouveia",
 };
 

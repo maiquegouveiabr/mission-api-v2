@@ -12,10 +12,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         message: "missing params",
       });
     } else {
-      const personOffer: PersonOffer[] = await fetchData(
-        `https://referralmanager.churchofjesuschrist.org/services/offers/person-offers/${id}`,
-        String(refreshToken)
-      );
+      const url = `https://referralmanager.churchofjesuschrist.org/services/offers/person-offers/${id}`;
+      const personOffer: PersonOffer[] = await fetchData(url, String(refreshToken));
 
       if (personOffer.length > 0) {
         const url = `https://referralmanager.churchofjesuschrist.org/services/campaign/${personOffer[personOffer.length - 1].boncomCampaignId}`;
