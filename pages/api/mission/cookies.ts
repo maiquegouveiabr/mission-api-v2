@@ -17,20 +17,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const page = await browser.newPage();
       await page.goto("https://referralmanager.churchofjesuschrist.org/");
 
-      await page.waitForSelector("#input28", { visible: true });
-      await page.type("#input28", String(username));
-      await page.waitForSelector("input[type='submit']", {
+      await page.waitForSelector("#username-input", { visible: true, timeout: 3000 });
+      await page.type("#username-input", String(username));
+      await page.waitForSelector("#button-primary", {
         visible: true,
       });
-      await page.click("input[type='submit']");
-      await page.waitForSelector("input.password-with-toggle", { visible: true, timeout: 3000 });
-      await page.type("input.password-with-toggle", String(password));
-      await page.waitForSelector("input[type='submit']", {
+      await page.click("#button-primary");
+      await page.waitForSelector("#password-input", { visible: true, timeout: 3000 });
+      await page.type("#password-input", String(password));
+      await page.waitForSelector("#button-primary", {
         visible: true,
       });
-      await page.click("input[type='submit']");
-      await page.waitForResponse((response) => response.url().includes("auth") && response.status() === 200);
-      const cookies = await page.cookies();
+      await page.click("#button-primary");
+      await page.waitForResponse((response) => response.url().includes("state") && response.status() === 200);
+
+      const cookies = await browser.cookies();
+
       if (cookies) {
         res.status(200).json(cookies);
       } else {

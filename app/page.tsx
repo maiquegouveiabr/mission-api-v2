@@ -36,6 +36,7 @@ export default function Page() {
 
       const cookies: Cookie[] = await response.json();
       if (cookies) {
+        console.log(cookies);
         const REFRESH_TOKEN = cookies.find((cookie) => cookie.name === "oauth-abw_refresh_token");
         if (REFRESH_TOKEN) {
           localStorage.setItem("REFRESH_TOKEN", REFRESH_TOKEN.value);
